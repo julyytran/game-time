@@ -1,4 +1,4 @@
-# Game Time Starter Kit
+# GO GO NYAN CAT
 
 To install the dependencies:
 
