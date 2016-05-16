@@ -48,7 +48,7 @@
 
 	$(document).ready(function () {
 	  $('#nyan-cat-image').hide();
-	  // $(document).on('keydown', getDirection)
+	  $(document).on('keydown', getDirection);
 	});
 
 	var direction = "right";
@@ -68,9 +68,9 @@
 
 	Cat.prototype.draw = function () {
 	  this.context.drawImage(this.image, this.x, this.y);
-	  this.x++;
-	  console.log(this.y++);
-	  // move(this, direction);
+	  // this.x++
+	  // console.log(this.y++)
+	  move(this, direction);
 	  return this;
 	};
 
@@ -80,41 +80,21 @@
 	  requestAnimationFrame(gameLoop);
 	});
 
-	// function getDirection() {
-	//   if (key.keyCode === 39) {
-	//     direction = "right";
-	//   } else if (key.keyCode === 40) {
-	//     direction = "up";
-	//   } else if (key.keyCode === 37) {
-	//     direction = "left";
-	//   } else if (key.keyCode === 38) {
-	//     direction = "down";
-	//   }
-	// };
+	function getDirection(key) {
+	  if (key.keyCode === 40) {
+	    direction = "up";
+	  } else if (key.keyCode === 38) {
+	    direction = "down";
+	  }
+	};
 
-	// $(document).on('keydown', function(key) {
-	//   if (key.keyCode === 39) {
-	//     direction = "right";
-	//   } else if (key.keyCode === 40) {
-	//     direction = "up";
-	//   } else if (key.keyCode === 37) {
-	//     direction = "left";
-	//   } else if (key.keyCode === 38) {
-	//     direction = "down";
-	//   }
-	// });
-
-	// var move = function(object, direction) {
-	//   if (direction === "right") {
-	//     object.x++;
-	//   } else if (direction === "left") {
-	//     object.x--;
-	//   } else if (direction === "down") {
-	//     object.y--;
-	//   } else if (direction === "up") {
-	//     object.y++;
-	//   }
-	// }
+	var move = function move(object, direction) {
+	  if (direction === "down") {
+	    object.y--;
+	  } else if (direction === "up") {
+	    object.y++;
+	  }
+	};
 
 /***/ }
 /******/ ]);
