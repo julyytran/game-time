@@ -51,7 +51,7 @@
 	  $(document).on('keydown', getDirection);
 	});
 
-	var direction = "right";
+	var direction = "still";
 	var canvas = document.getElementById('game');
 	var context = canvas.getContext('2d');
 	var nyanCat = new Cat();
@@ -61,7 +61,7 @@
 	  this.width = 100;
 	  this.height = 100;
 	  this.x = 10;
-	  this.y = 10;
+	  this.y = 200;
 	  this.context = context;
 	}
 
@@ -87,15 +87,15 @@
 
 	var move = function move(object, direction) {
 	  if (direction === "down") {
-	    // object.y--
-	    if (object.y > 0) {
-	      object.y--;
+	    if (object.y > 10) {
+	      object.y = object.y - 3;
 	    }
 	  } else if (direction === "up") {
-	    // object.y++;
 	    if (object.y < 400) {
-	      object.y++;
+	      object.y = object.y + 3;
 	    }
+	  } else if (direction === "still") {
+	    console.log("hey");
 	  }
 	};
 
