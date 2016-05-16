@@ -87,9 +87,15 @@
 
 	var move = function move(object, direction) {
 	  if (direction === "down") {
-	    object.y--;
+	    // object.y--
+	    if (object.y > 0) {
+	      object.y--;
+	    }
 	  } else if (direction === "up") {
-	    object.y++;
+	    // object.y++;
+	    if (object.y < 400) {
+	      object.y++;
+	    }
 	  }
 	};
 
