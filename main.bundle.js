@@ -52,7 +52,6 @@
 	});
 
 	var direction = "right";
-
 	var canvas = document.getElementById('game');
 	var context = canvas.getContext('2d');
 	var nyanCat = new Cat();
@@ -68,14 +67,12 @@
 
 	Cat.prototype.draw = function () {
 	  this.context.drawImage(this.image, this.x, this.y);
-	  // this.x++
-	  // console.log(this.y++)
 	  move(this, direction);
 	  return this;
 	};
 
 	requestAnimationFrame(function gameLoop() {
-	  context.clearRect(0, 0, canvas.width, canvas.height); // Clear the canvas.
+	  context.clearRect(0, 0, canvas.width, canvas.height);
 	  nyanCat.draw();
 	  requestAnimationFrame(gameLoop);
 	});
