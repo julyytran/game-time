@@ -48,13 +48,13 @@
 
 	$(document).ready(function () {
 	  $('#nyan-cat-image').hide();
-	  $(document).on('keydown', getDirection);
+	  // $(document).on('keydown', getDirection)
 	});
 
 	var direction = "still";
 	var canvas = document.getElementById('game');
 	var context = canvas.getContext('2d');
-	var nyanCat = new Cat();
+	// var nyanCat = new Cat();
 
 	function Cat() {
 	  this.image = document.getElementById("nyan-cat-image");
@@ -67,13 +67,17 @@
 
 	Cat.prototype.draw = function () {
 	  this.context.drawImage(this.image, this.x, this.y);
-	  move(this, direction);
-	  return this;
+	  // var cat = this
+	  window.nyanCat = this;
+	  $(document).on('keydown', getDirection);
+	  // move(this, direction);
+	  return nyanCat;
 	};
 
 	requestAnimationFrame(function gameLoop() {
 	  context.clearRect(0, 0, canvas.width, canvas.height);
-	  nyanCat.draw();
+	  var cat = new Cat();
+	  cat.draw();
 	  requestAnimationFrame(gameLoop);
 	});
 
@@ -83,20 +87,30 @@
 	  } else if (key.keyCode === 38) {
 	    direction = "down";
 	  }
+	  move(direction);
 	};
 
-	var move = function move(object, direction) {
+	var move = function move(direction) {
 	  if (direction === "down") {
-	    if (object.y > 10) {
-	      object.y = object.y - 3;
+	    if (nyanCat.y > 10) {
+	      nyanCat.y = nyanCat.y - 100;
+	      debugger;
 	    }
 	  } else if (direction === "up") {
-	    if (object.y < 400) {
-	      object.y = object.y + 3;
+	    if (nyanCat.y < 400) {
+	      nyanCat.y = nyanCat.y + 100;
 	    }
-	  } else if (direction === "still") {
-	    console.log("hey");
 	  }
+	  // if (direction === "down") {
+	  //   if (object.y > 10){
+	  //     object.y = object.y - 3
+	  //   }
+	  // } else if (direction === "up") {
+	  //   if (object.y < 400){
+	  //     object.y = object.y + 3 ;
+	  //   }
+	  // }
+	  else if (direction === "still") {}
 	};
 
 /***/ }
