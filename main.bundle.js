@@ -84,8 +84,19 @@
 	  this.image = document.getElementById(sushiImages[Math.floor(Math.random() * sushiImages.length)]);
 	  this.width = 70;
 	  this.height = 58;
-	  this.x = 600; //width of the canvas
+	  this.x = 600;
 	  this.y = rowsForSprites[Math.floor(Math.random() * rowsForSprites.length)];
+	  this.context = context;
+	}
+
+	function Trash() {
+	  var rowsForTrash = [70, 170, 270, 370];
+	  var trashImages = ['kawaii-poop', 'kawaii-toaster'];
+	  this.image = document.getElementById(trashImages[Math.floor(Math.random() * trashImages.length)]);
+	  this.width = 70;
+	  this.height = 58;
+	  this.x = 600;
+	  this.y = rowsForTrash[Math.floor(Math.random() * rowsForTrash.length)];
 	  this.context = context;
 	}
 
@@ -97,12 +108,27 @@
 	Sushi.prototype.move = function (sushis, index) {
 	  this.x -= 3;
 	  if (this.x < -70) {
-	    clearSushi(sushis, index);
+	    clearObject(sushis, index);
 	  }
 	  return this;
 	};
 
 	var sushis = [];
+
+	Trash.prototype.draw = function () {
+	  this.context.drawImage(this.image, this.x, this.y);
+	  return this;
+	};
+
+	Trash.prototype.move = function (trashes, index) {
+	  this.x -= 3;
+	  if (this.x < -70) {
+	    clearObject(trashes, index);
+	  }
+	  return this;
+	};
+
+	var trashes = [];
 
 	requestAnimationFrame(function gameLoop() {
 	  context.clearRect(0, 0, canvas.width, canvas.height);
@@ -115,27 +141,28 @@
 	  var now = Date.now();
 	  var elapsed = (now - lastGenTime) / 1000;
 
-	  if (elapsed > 1) {
+	  if (elapsed > 2) {
 	    lastGenTime = now;
-	    var sushi = new Sushi();
-	    sushis.push(sushi);
+	    makeObject();
 	  }
-	  // TO DO:
-	  //pop sushi out of array
-	  //separate DOM from logic of game
-	  //test collision detection
-	  //clean up collision detection
-	  //want Cat in own file, will get options object with context in it. index.js will have loop, canvas, initial setup
-	  //will never test index.js
 
 	  for (var i = 0; i < sushis.length; i++) {
-	    //collision detection is something game should do
 	    var currentSushi = sushis[i];
 	    currentSushi.draw();
 	    currentSushi.move(sushis, i);
 	    if (nyanCat.x < currentSushi.x + currentSushi.width && nyanCat.x + nyanCat.width > currentSushi.x && nyanCat.y < currentSushi.y + currentSushi.height && nyanCat.height + nyanCat.y > currentSushi.y) {
-	      clearSushi(sushis, i);
+	      clearObject(sushis, i);
 	      addPoints(30);
+	    }
+	  }
+
+	  for (var i = 0; i < trashes.length; i++) {
+	    var currentTrash = trashes[i];
+	    currentTrash.draw();
+	    currentTrash.move(trashes, i);
+	    if (nyanCat.x < currentTrash.x + currentTrash.width && nyanCat.x + nyanCat.width > currentTrash.x && nyanCat.y < currentTrash.y + currentTrash.height && nyanCat.height + nyanCat.y > currentTrash.y) {
+	      clearObject(trashes, i);
+	      //  addPoints(30) change to take life away
 	    }
 	  }
 
@@ -146,8 +173,20 @@
 	  points += addedPoints;
 	}
 
-	function clearSushi(sushis, index) {
-	  sushis.splice(index, 1);
+	function clearObject(collection, index) {
+	  collection.splice(index, 1);
+	}
+
+	function makeObject() {
+	  var number = Math.random();
+
+	  if (number > 0.5) {
+	    var sushi = new Sushi();
+	    sushis.push(sushi);
+	  } else {
+	    var trash = new Trash();
+	    trashes.push(trash);
+	  }
 	}
 
 /***/ }
