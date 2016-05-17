@@ -53,6 +53,8 @@
 	var catDrawMinY = 50;
 	var catDrawMaxY = 350;
 	var nyanCat = new Cat();
+	var lastGenTime = 0;
+	var points = 0;
 
 	function Cat() {
 	  this.image = document.getElementById("nyan-cat-image");
@@ -92,45 +94,61 @@
 	  return this;
 	};
 
-	Sushi.prototype.move = function () {
+	Sushi.prototype.move = function (sushis, index) {
 	  this.x -= 3;
+	  if (this.x < -70) {
+	    clearSushi(sushis, index);
+	  }
 	  return this;
 	};
 
-	var sushi = new Sushi();
-	var lastTime;
-	var counter = 0;
-	var startTime = Date.now();
+	var sushis = [];
 
 	requestAnimationFrame(function gameLoop() {
 	  context.clearRect(0, 0, canvas.width, canvas.height);
+	  nyanCat.draw();
+
+	  context.font = "30px Comic Sans MS";
+	  context.fillStyle = "magenta";
+	  context.fillText("Points: " + points, 20, 40);
 
 	  var now = Date.now();
-	  // var dt = (now - lastTime) / 1000.0;
-	  // counter += dt
-	  var timeElapsed = (now - startTime) / 1000;
-	  // console.log(timeElapsed)
-	  // console.log(timeElapsed)
-	  nyanCat.draw();
-	  // for (var i = 0; i < 10; i++) {
-	  // sushi.draw()
-	  // sushi.move()
+	  var elapsed = (now - lastGenTime) / 1000;
 
-	  if (Math.floor(timeElapsed) === 5) {
-	    sushi.draw();
-	    sushi.move();
-	    console.log('hey!');
+	  if (elapsed > 1) {
+	    lastGenTime = now;
+	    var sushi = new Sushi();
+	    sushis.push(sushi);
 	  }
+	  // TO DO:
+	  //pop sushi out of array
+	  //separate DOM from logic of game
+	  //test collision detection
+	  //clean up collision detection
+	  //want Cat in own file, will get options object with context in it. index.js will have loop, canvas, initial setup
+	  //will never test index.js
 
-	  // lastTime = now;
-	  // }
-	  //first frame- draw sushi, move it for a series of frames
-	  //next frame- draw new sushi on time interval which increases with difficulty
-	  // sushi.draw()
-	  // sushi.move()
+	  for (var i = 0; i < sushis.length; i++) {
+	    //collision detection is something game should do
+	    var currentSushi = sushis[i];
+	    currentSushi.draw();
+	    currentSushi.move(sushis, i);
+	    if (nyanCat.x < currentSushi.x + currentSushi.width && nyanCat.x + nyanCat.width > currentSushi.x && nyanCat.y < currentSushi.y + currentSushi.height && nyanCat.height + nyanCat.y > currentSushi.y) {
+	      clearSushi(sushis, i);
+	      addPoints(30);
+	    }
+	  }
 
 	  requestAnimationFrame(gameLoop);
 	});
+
+	function addPoints(addedPoints) {
+	  points += addedPoints;
+	}
+
+	function clearSushi(sushis, index) {
+	  sushis.splice(index, 1);
+	}
 
 /***/ }
 /******/ ]);
