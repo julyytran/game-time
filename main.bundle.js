@@ -47,8 +47,7 @@
 	'use strict';
 
 	$(document).ready(function () {
-	  $('#nyan-cat-image').hide();
-	  $(document).on('keydown', getDirection);
+	  // $(document).on('keyup', getDirection)
 	});
 
 	var direction = "still";
@@ -67,7 +66,11 @@
 
 	Cat.prototype.draw = function () {
 	  this.context.drawImage(this.image, this.x, this.y);
-	  move(this, direction);
+	  var kitty = this;
+	  $(document).on('keyup', function (e) {
+	    getDirection(e.keyCode);
+	    move(kitty, direction);
+	  });
 	  return this;
 	};
 
@@ -77,10 +80,10 @@
 	  requestAnimationFrame(gameLoop);
 	});
 
-	function getDirection(key) {
-	  if (key.keyCode === 40) {
+	function getDirection(keyCode) {
+	  if (keyCode === 40) {
 	    direction = "up";
-	  } else if (key.keyCode === 38) {
+	  } else if (keyCode === 38) {
 	    direction = "down";
 	  }
 	};
@@ -88,11 +91,15 @@
 	var move = function move(object, direction) {
 	  if (direction === "down") {
 	    if (object.y > 10) {
-	      object.y = object.y - 3;
+	      // object.y = object.y - 50
+	      object.y = 100;
+	      console.log(object.y);
 	    }
 	  } else if (direction === "up") {
 	    if (object.y < 400) {
-	      object.y = object.y + 3;
+	      // object.y = object.y + 50 ;
+	      object.y = 300;
+	      console.log(object.y);
 	    }
 	  } else if (direction === "still") {
 	    console.log("hey");
