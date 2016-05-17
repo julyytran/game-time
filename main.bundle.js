@@ -46,9 +46,7 @@
 
 	'use strict';
 
-	$(document).ready(function () {
-	  // $(document).on('keyup', getDirection)
-	});
+	$(document).ready(function () {});
 
 	var direction = "still";
 	var canvas = document.getElementById('game');
@@ -60,7 +58,7 @@
 	  this.width = 100;
 	  this.height = 100;
 	  this.x = 10;
-	  this.y = 200;
+	  this.y = 50;
 	  this.context = context;
 	}
 
@@ -68,7 +66,7 @@
 	  this.context.drawImage(this.image, this.x, this.y);
 	  var kitty = this;
 	  $(document).on('keyup', function (e) {
-	    getDirection(e.keyCode);
+	    getDirection(e);
 	    move(kitty, direction);
 	  });
 	  return this;
@@ -80,27 +78,35 @@
 	  requestAnimationFrame(gameLoop);
 	});
 
-	function getDirection(keyCode) {
-	  if (keyCode === 40) {
+	function getDirection(key) {
+	  if (key.keyCode === 38) {
 	    direction = "up";
-	  } else if (keyCode === 38) {
+	  } else if (key.keyCode === 40) {
 	    direction = "down";
 	  }
+	}
+
+	var moveDown = {
+	  50: 150,
+	  150: 250,
+	  250: 350,
+	  350: 350
+	};
+
+	var moveUp = {
+	  50: 50,
+	  150: 50,
+	  250: 150,
+	  350: 250
 	};
 
 	var move = function move(object, direction) {
 	  if (direction === "down") {
-	    if (object.y > 10) {
-	      // object.y = object.y - 50
-	      object.y = 100;
-	      console.log(object.y);
-	    }
+	    object.y = moveDown[object.y];
+	    console.log(object.y);
 	  } else if (direction === "up") {
-	    if (object.y < 400) {
-	      // object.y = object.y + 50 ;
-	      object.y = 300;
-	      console.log(object.y);
-	    }
+	    object.y = moveUp[object.y];
+	    console.log(object.y);
 	  } else if (direction === "still") {
 	    console.log("hey");
 	  }
