@@ -16,5 +16,9 @@ describe("Sushi", function(){
       assert.equal(sushi.height, 58);
       assert.equal(sushi.context, "test");
     });
+
+    // it('should move left', function() {
+    //   sushi.move
+    // });
   });
 });
