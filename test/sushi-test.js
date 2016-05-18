@@ -4,9 +4,8 @@ const assert = chai.assert;
 const Sushi = require('../lib/sushi');
 
 describe("Sushi", function(){
+  var sushi = new Sushi({context: "test"});
   context("with default attributes", function() {
-    var sushi = new Sushi({context: "test"});
-
     it('should assign default values', function() {
       var rowsForSprites = [70, 170, 270, 370];
 
@@ -16,9 +15,11 @@ describe("Sushi", function(){
       assert.equal(sushi.height, 58);
       assert.equal(sushi.context, "test");
     });
-
-    // it('should move left', function() {
-    //   sushi.move
-    // });
+  });
+  context("within game", function() {
+    it('should move left', function() {
+      sushi.move()
+      assert.equal(sushi.x, 597)
+    });
   });
 });

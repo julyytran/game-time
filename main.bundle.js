@@ -66,8 +66,8 @@
 	    lastGenTime = now;
 	    game.makeObject();
 	  }
-	  game.checkSushiCollision();
-	  game.checkTrashCollision();
+	  game.addSushi();
+	  game.addTrash();
 	  game.determineContinue(gameLoop);
 	});
 
@@ -83,17 +83,20 @@
 	var lifeCounter = 0;
 	var Cat = __webpack_require__(2);
 	var Sushi = __webpack_require__(3);
-	var Trash = __webpack_require__(4);
-	var Heart = __webpack_require__(5);
+	var Trash = __webpack_require__(5);
+	var Heart = __webpack_require__(6);
+	var Helpers = __webpack_require__(4);
 
 	var nyanCat = new Cat({ context: context });
 	var catDrawMinY = 50;
 	var catDrawMaxY = 350;
 	var sushis = [];
 	var trashes = [];
+	var helpers = new Helpers();
 	var heart1 = new Heart(500, { context: context });
 	var heart2 = new Heart(550, { context: context });
 	var heart3 = new Heart(600, { context: context });
+	var hearts = [heart1, heart2, heart3];
 	var lastGenTime = 0;
 	var points = 0;
 
@@ -135,28 +138,26 @@
 	  }
 	};
 
-	Game.prototype.checkSushiCollision = function () {
+	Game.prototype.addSushi = function () {
 	  for (var i = 0; i < sushis.length; i++) {
 	    var currentSushi = sushis[i];
 	    currentSushi.draw();
 	    currentSushi.move(sushis, i);
-	    if (nyanCat.x < currentSushi.x + currentSushi.width && nyanCat.x + nyanCat.width > currentSushi.x && nyanCat.y < currentSushi.y + currentSushi.height && nyanCat.height + nyanCat.y > currentSushi.y) {
-	      clearObject(sushis, i);
-	      addPoints(30);
+	    if (helpers.checkCollision(currentSushi, nyanCat)) {
+	      helpers.clearObject(sushis, i);
+	      points = helpers.addPoints(points, 30);
 	    }
 	  }
 	};
 
-	Game.prototype.checkTrashCollision = function () {
+	Game.prototype.addTrash = function () {
 	  for (var i = 0; i < trashes.length; i++) {
 	    var currentTrash = trashes[i];
 	    currentTrash.draw();
 	    currentTrash.move(trashes, i);
-	    if (nyanCat.x < currentTrash.x + currentTrash.width && nyanCat.x + nyanCat.width > currentTrash.x && nyanCat.y < currentTrash.y + currentTrash.height && nyanCat.height + nyanCat.y > currentTrash.y) {
-	      clearObject(trashes, i);
-	      if (lifeCounter < 3) {
-	        loseHeart();
-	      }
+	    if (helpers.checkCollision(currentTrash, nyanCat)) {
+	      helpers.clearObject(trashes, i);
+	      lifeCounter = helpers.checkLoseHeart(lifeCounter, hearts, helpers);
 	    }
 	  }
 	};
@@ -171,20 +172,6 @@
 	    context.drawImage(gameOver, 200, 200);
 	  }
 	};
-
-	function clearObject(collection, index) {
-	  collection.splice(index, 1);
-	}
-
-	function addPoints(addedPoints) {
-	  points += addedPoints;
-	}
-
-	function loseHeart() {
-	  var hearts = [heart1, heart2, heart3];
-	  hearts[lifeCounter].image = document.getElementById("empty-heart");
-	  lifeCounter++;
-	}
 
 	module.exports = Game;
 
@@ -208,21 +195,16 @@
 	  return this;
 	};
 
-	function moveCat() {
-	  if (event.keyCode === 38) {
-	    nyanCat.y = Math.max(catDrawMinY, nyanCat.y - nyanCat.height);
-	  } else if (event.keyCode === 40) {
-	    nyanCat.y = Math.min(catDrawMaxY, nyanCat.y + nyanCat.height);
-	  }
-	};
-
 	module.exports = Cat;
 
 /***/ },
 /* 3 */
-/***/ function(module, exports) {
+/***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
+
+	var Helpers = __webpack_require__(4);
+	var helpers = new Helpers();
 
 	function Sushi(options) {
 	  var rowsForSprites = [70, 170, 270, 370];
@@ -243,14 +225,10 @@
 	Sushi.prototype.move = function (sushis, index) {
 	  this.x -= 3;
 	  if (this.x < -70) {
-	    clearObject(sushis, index);
+	    helpers.clearObject(sushis, index);
 	  }
 	  return this;
 	};
-
-	function clearObject(collection, index) {
-	  collection.splice(index, 1);
-	}
 
 	module.exports = Sushi;
 
@@ -258,7 +236,45 @@
 /* 4 */
 /***/ function(module, exports) {
 
+	"use strict";
+
+	function Helpers() {};
+
+	Helpers.prototype.clearObject = function (collection, index) {
+	  collection.splice(index, 1);
+	};
+
+	Helpers.prototype.addPoints = function (points, addedPoints) {
+	  points += addedPoints;
+	  return points;
+	};
+
+	Helpers.prototype.loseHeart = function (hearts, lifeCounter) {
+	  hearts[lifeCounter].image = document.getElementById("empty-heart");
+	  lifeCounter++;
+	  return lifeCounter;
+	};
+
+	Helpers.prototype.checkCollision = function (currentSushi, nyanCat) {
+	  return nyanCat.x < currentSushi.x + currentSushi.width && nyanCat.x + nyanCat.width > currentSushi.x && nyanCat.y < currentSushi.y + currentSushi.height && nyanCat.height + nyanCat.y > currentSushi.y;
+	};
+
+	Helpers.prototype.checkLoseHeart = function (lifeCounter, hearts, helpers) {
+	  if (lifeCounter < 3) {
+	    return lifeCounter = helpers.loseHeart(hearts, lifeCounter);
+	  };
+	};
+
+	module.exports = Helpers;
+
+/***/ },
+/* 5 */
+/***/ function(module, exports, __webpack_require__) {
+
 	'use strict';
+
+	var Helpers = __webpack_require__(4);
+	var helpers = new Helpers();
 
 	function Trash(options) {
 	  var rowsForTrash = [70, 170, 270, 370];
@@ -279,19 +295,15 @@
 	Trash.prototype.move = function (trashes, index) {
 	  this.x -= 3;
 	  if (this.x < -70) {
-	    clearObject(trashes, index);
+	    helpers.clearObject(trashes, index);
 	  }
 	  return this;
 	};
 
-	function clearObject(collection, index) {
-	  collection.splice(index, 1);
-	}
-
 	module.exports = Trash;
 
 /***/ },
-/* 5 */
+/* 6 */
 /***/ function(module, exports) {
 
 	"use strict";
