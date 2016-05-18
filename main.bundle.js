@@ -53,6 +53,9 @@
 	var catDrawMinY = 50;
 	var catDrawMaxY = 350;
 	var nyanCat = new Cat();
+	var heart1 = new Heart(500);
+	var heart2 = new Heart(550);
+	var heart3 = new Heart(600);
 	var lastGenTime = 0;
 	var points = 0;
 
@@ -100,6 +103,15 @@
 	  this.context = context;
 	}
 
+	function Heart(x) {
+	  this.image = document.getElementById("full-heart");
+	  this.width = 60;
+	  this.height = 60;
+	  this.x = x;
+	  this.y = 10;
+	  this.context = context;
+	}
+
 	Sushi.prototype.draw = function () {
 	  this.context.drawImage(this.image, this.x, this.y);
 	  return this;
@@ -130,9 +142,17 @@
 
 	var trashes = [];
 
+	Heart.prototype.draw = function () {
+	  this.context.drawImage(this.image, this.x, this.y);
+	  return this;
+	};
+
 	requestAnimationFrame(function gameLoop() {
 	  context.clearRect(0, 0, canvas.width, canvas.height);
 	  nyanCat.draw();
+	  heart1.draw();
+	  heart2.draw();
+	  heart3.draw();
 
 	  context.font = "30px Comic Sans MS";
 	  context.fillStyle = "magenta";
@@ -162,11 +182,23 @@
 	    currentTrash.move(trashes, i);
 	    if (nyanCat.x < currentTrash.x + currentTrash.width && nyanCat.x + nyanCat.width > currentTrash.x && nyanCat.y < currentTrash.y + currentTrash.height && nyanCat.height + nyanCat.y > currentTrash.y) {
 	      clearObject(trashes, i);
-	      //  addPoints(30) change to take life away
+	      if (lifeCounter < 3) {
+	        loseHeart();
+	      }
 	    }
 	  }
 
-	  requestAnimationFrame(gameLoop);
+	  if (lifeCounter < 3) {
+	    // debugger
+	    requestAnimationFrame(gameLoop);
+	    console.log(lifeCounter);
+	  } else {
+	    // debugger
+	    heart3.image = document.getElementById("empty-heart");
+	    heart3.draw();
+	    var gameOver = document.getElementById("game-over");
+	    context.drawImage(gameOver, 200, 200);
+	  }
 	});
 
 	function addPoints(addedPoints) {
@@ -187,6 +219,14 @@
 	    var trash = new Trash();
 	    trashes.push(trash);
 	  }
+	}
+
+	var lifeCounter = 0;
+
+	function loseHeart() {
+	  var hearts = [heart1, heart2, heart3];
+	  hearts[lifeCounter].image = document.getElementById("empty-heart");
+	  lifeCounter++;
 	}
 
 /***/ }
