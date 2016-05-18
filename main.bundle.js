@@ -51,11 +51,7 @@
 	var lastGenTime = 0;
 
 	$(document).on('keydown', function (event) {
-	  if (event.keyCode === 38) {
-	    game.moveUp();
-	  } else if (event.keyCode === 40) {
-	    game.moveDown();
-	  }
+	  game.moveCat(event);
 	});
 
 	requestAnimationFrame(function gameLoop() {
@@ -103,12 +99,12 @@
 
 	function Game() {}
 
-	Game.prototype.moveUp = function () {
-	  nyanCat.y = Math.max(catDrawMinY, nyanCat.y - nyanCat.height);
-	};
-
-	Game.prototype.moveDown = function () {
-	  nyanCat.y = Math.min(catDrawMaxY, nyanCat.y + nyanCat.height);
+	Game.prototype.moveCat = function (event) {
+	  if (event.keyCode === 38) {
+	    nyanCat.y = Math.max(catDrawMinY, nyanCat.y - nyanCat.height);
+	  } else if (event.keyCode === 40) {
+	    nyanCat.y = Math.min(catDrawMaxY, nyanCat.y + nyanCat.height);
+	  }
 	};
 
 	Game.prototype.clearCanvas = function () {
