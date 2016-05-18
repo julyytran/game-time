@@ -42,30 +42,169 @@
 /************************************************************************/
 /******/ ([
 /* 0 */
-/***/ function(module, exports) {
+/***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
 
-	$(document).ready(function () {});
+	var Game = __webpack_require__(1);
+	var game = new Game();
+	var lastGenTime = 0;
+
+	$(document).on('keydown', function (event) {
+	  if (event.keyCode === 38) {
+	    game.moveUp();
+	  } else if (event.keyCode === 40) {
+	    game.moveDown();
+	  }
+	});
+
+	requestAnimationFrame(function gameLoop() {
+	  game.clearCanvas();
+	  game.drawHeartsAndCat();
+	  game.writePoints();
+
+	  var now = Date.now();
+	  var elapsed = (now - lastGenTime) / 1000;
+
+	  if (elapsed > 2) {
+	    lastGenTime = now;
+	    game.makeObject();
+	  }
+	  game.checkSushiCollision();
+	  game.checkTrashCollision();
+	  game.determineContinue(gameLoop);
+	});
+
+/***/ },
+/* 1 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
 
 	var canvas = document.getElementById('game');
 	var context = canvas.getContext('2d');
+
+	var lifeCounter = 0;
+	var Cat = __webpack_require__(2);
+	var Sushi = __webpack_require__(3);
+	var Trash = __webpack_require__(4);
+	var Heart = __webpack_require__(5);
+
+	var nyanCat = new Cat({ context: context });
 	var catDrawMinY = 50;
 	var catDrawMaxY = 350;
-	var nyanCat = new Cat();
-	var heart1 = new Heart(500);
-	var heart2 = new Heart(550);
-	var heart3 = new Heart(600);
+	var sushis = [];
+	var trashes = [];
+	var heart1 = new Heart(500, { context: context });
+	var heart2 = new Heart(550, { context: context });
+	var heart3 = new Heart(600, { context: context });
 	var lastGenTime = 0;
 	var points = 0;
 
-	function Cat() {
+	function Game() {}
+
+	Game.prototype.moveUp = function () {
+	  nyanCat.y = Math.max(catDrawMinY, nyanCat.y - nyanCat.height);
+	};
+
+	Game.prototype.moveDown = function () {
+	  nyanCat.y = Math.min(catDrawMaxY, nyanCat.y + nyanCat.height);
+	};
+
+	Game.prototype.clearCanvas = function () {
+	  context.clearRect(0, 0, canvas.width, canvas.height);
+	};
+
+	Game.prototype.drawHeartsAndCat = function () {
+	  nyanCat.draw();
+	  heart1.draw();
+	  heart2.draw();
+	  heart3.draw();
+	};
+
+	Game.prototype.writePoints = function () {
+	  context.font = "30px Comic Sans MS";
+	  context.fillStyle = "magenta";
+	  context.fillText("Points: " + points, 20, 40);
+	};
+
+	Game.prototype.makeObject = function () {
+	  var number = Math.random();
+	  if (number > 0.5) {
+	    var sushi = new Sushi({ context: context });
+	    sushis.push(sushi);
+	  } else {
+	    var trash = new Trash({ context: context });
+	    trashes.push(trash);
+	  }
+	};
+
+	Game.prototype.checkSushiCollision = function () {
+	  for (var i = 0; i < sushis.length; i++) {
+	    var currentSushi = sushis[i];
+	    currentSushi.draw();
+	    currentSushi.move(sushis, i);
+	    if (nyanCat.x < currentSushi.x + currentSushi.width && nyanCat.x + nyanCat.width > currentSushi.x && nyanCat.y < currentSushi.y + currentSushi.height && nyanCat.height + nyanCat.y > currentSushi.y) {
+	      clearObject(sushis, i);
+	      addPoints(30);
+	    }
+	  }
+	};
+
+	Game.prototype.checkTrashCollision = function () {
+	  for (var i = 0; i < trashes.length; i++) {
+	    var currentTrash = trashes[i];
+	    currentTrash.draw();
+	    currentTrash.move(trashes, i);
+	    if (nyanCat.x < currentTrash.x + currentTrash.width && nyanCat.x + nyanCat.width > currentTrash.x && nyanCat.y < currentTrash.y + currentTrash.height && nyanCat.height + nyanCat.y > currentTrash.y) {
+	      clearObject(trashes, i);
+	      if (lifeCounter < 3) {
+	        loseHeart();
+	      }
+	    }
+	  }
+	};
+
+	Game.prototype.determineContinue = function (gameLoop) {
+	  if (lifeCounter < 3) {
+	    requestAnimationFrame(gameLoop);
+	  } else {
+	    heart3.image = document.getElementById("empty-heart");
+	    heart3.draw();
+	    var gameOver = document.getElementById("game-over");
+	    context.drawImage(gameOver, 200, 200);
+	  }
+	};
+
+	function clearObject(collection, index) {
+	  collection.splice(index, 1);
+	}
+
+	function addPoints(addedPoints) {
+	  points += addedPoints;
+	}
+
+	function loseHeart() {
+	  var hearts = [heart1, heart2, heart3];
+	  hearts[lifeCounter].image = document.getElementById("empty-heart");
+	  lifeCounter++;
+	}
+
+	module.exports = Game;
+
+/***/ },
+/* 2 */
+/***/ function(module, exports) {
+
+	"use strict";
+
+	function Cat(options) {
 	  this.image = document.getElementById("nyan-cat-image");
 	  this.width = 100;
 	  this.height = 100;
 	  this.x = 10;
-	  this.y = catDrawMinY;
-	  this.context = context;
+	  this.y = 50;
+	  this.context = options.context || {};
 	}
 
 	Cat.prototype.draw = function () {
@@ -73,15 +212,23 @@
 	  return this;
 	};
 
-	$(document).on('keydown', function (event) {
+	function moveCat() {
 	  if (event.keyCode === 38) {
 	    nyanCat.y = Math.max(catDrawMinY, nyanCat.y - nyanCat.height);
 	  } else if (event.keyCode === 40) {
 	    nyanCat.y = Math.min(catDrawMaxY, nyanCat.y + nyanCat.height);
 	  }
-	});
+	};
 
-	function Sushi() {
+	module.exports = Cat;
+
+/***/ },
+/* 3 */
+/***/ function(module, exports) {
+
+	'use strict';
+
+	function Sushi(options) {
 	  var rowsForSprites = [70, 170, 270, 370];
 	  var sushiImages = ['egg-roll', 'roe-roll', 'fish-roll'];
 	  this.image = document.getElementById(sushiImages[Math.floor(Math.random() * sushiImages.length)]);
@@ -89,27 +236,7 @@
 	  this.height = 58;
 	  this.x = 600;
 	  this.y = rowsForSprites[Math.floor(Math.random() * rowsForSprites.length)];
-	  this.context = context;
-	}
-
-	function Trash() {
-	  var rowsForTrash = [70, 170, 270, 370];
-	  var trashImages = ['kawaii-poop', 'kawaii-toaster'];
-	  this.image = document.getElementById(trashImages[Math.floor(Math.random() * trashImages.length)]);
-	  this.width = 70;
-	  this.height = 58;
-	  this.x = 600;
-	  this.y = rowsForTrash[Math.floor(Math.random() * rowsForTrash.length)];
-	  this.context = context;
-	}
-
-	function Heart(x) {
-	  this.image = document.getElementById("full-heart");
-	  this.width = 60;
-	  this.height = 60;
-	  this.x = x;
-	  this.y = 10;
-	  this.context = context;
+	  this.context = options.context || {};
 	}
 
 	Sushi.prototype.draw = function () {
@@ -125,7 +252,28 @@
 	  return this;
 	};
 
-	var sushis = [];
+	function clearObject(collection, index) {
+	  collection.splice(index, 1);
+	}
+
+	module.exports = Sushi;
+
+/***/ },
+/* 4 */
+/***/ function(module, exports) {
+
+	'use strict';
+
+	function Trash(options) {
+	  var rowsForTrash = [70, 170, 270, 370];
+	  var trashImages = ['kawaii-poop', 'kawaii-toaster'];
+	  this.image = document.getElementById(trashImages[Math.floor(Math.random() * trashImages.length)]);
+	  this.width = 70;
+	  this.height = 58;
+	  this.x = 600;
+	  this.y = rowsForTrash[Math.floor(Math.random() * rowsForTrash.length)];
+	  this.context = options.context || {};;
+	}
 
 	Trash.prototype.draw = function () {
 	  this.context.drawImage(this.image, this.x, this.y);
@@ -140,94 +288,33 @@
 	  return this;
 	};
 
-	var trashes = [];
+	function clearObject(collection, index) {
+	  collection.splice(index, 1);
+	}
+
+	module.exports = Trash;
+
+/***/ },
+/* 5 */
+/***/ function(module, exports) {
+
+	"use strict";
+
+	function Heart(x, options) {
+	  this.image = document.getElementById("full-heart");
+	  this.width = 60;
+	  this.height = 60;
+	  this.x = x;
+	  this.y = 10;
+	  this.context = options.context || {};
+	}
 
 	Heart.prototype.draw = function () {
 	  this.context.drawImage(this.image, this.x, this.y);
 	  return this;
 	};
 
-	requestAnimationFrame(function gameLoop() {
-	  context.clearRect(0, 0, canvas.width, canvas.height);
-	  nyanCat.draw();
-	  heart1.draw();
-	  heart2.draw();
-	  heart3.draw();
-
-	  context.font = "30px Comic Sans MS";
-	  context.fillStyle = "magenta";
-	  context.fillText("Points: " + points, 20, 40);
-
-	  var now = Date.now();
-	  var elapsed = (now - lastGenTime) / 1000;
-
-	  if (elapsed > 2) {
-	    lastGenTime = now;
-	    makeObject();
-	  }
-
-	  for (var i = 0; i < sushis.length; i++) {
-	    var currentSushi = sushis[i];
-	    currentSushi.draw();
-	    currentSushi.move(sushis, i);
-	    if (nyanCat.x < currentSushi.x + currentSushi.width && nyanCat.x + nyanCat.width > currentSushi.x && nyanCat.y < currentSushi.y + currentSushi.height && nyanCat.height + nyanCat.y > currentSushi.y) {
-	      clearObject(sushis, i);
-	      addPoints(30);
-	    }
-	  }
-
-	  for (var i = 0; i < trashes.length; i++) {
-	    var currentTrash = trashes[i];
-	    currentTrash.draw();
-	    currentTrash.move(trashes, i);
-	    if (nyanCat.x < currentTrash.x + currentTrash.width && nyanCat.x + nyanCat.width > currentTrash.x && nyanCat.y < currentTrash.y + currentTrash.height && nyanCat.height + nyanCat.y > currentTrash.y) {
-	      clearObject(trashes, i);
-	      if (lifeCounter < 3) {
-	        loseHeart();
-	      }
-	    }
-	  }
-
-	  if (lifeCounter < 3) {
-	    // debugger
-	    requestAnimationFrame(gameLoop);
-	    console.log(lifeCounter);
-	  } else {
-	    // debugger
-	    heart3.image = document.getElementById("empty-heart");
-	    heart3.draw();
-	    var gameOver = document.getElementById("game-over");
-	    context.drawImage(gameOver, 200, 200);
-	  }
-	});
-
-	function addPoints(addedPoints) {
-	  points += addedPoints;
-	}
-
-	function clearObject(collection, index) {
-	  collection.splice(index, 1);
-	}
-
-	function makeObject() {
-	  var number = Math.random();
-
-	  if (number > 0.5) {
-	    var sushi = new Sushi();
-	    sushis.push(sushi);
-	  } else {
-	    var trash = new Trash();
-	    trashes.push(trash);
-	  }
-	}
-
-	var lifeCounter = 0;
-
-	function loseHeart() {
-	  var hearts = [heart1, heart2, heart3];
-	  hearts[lifeCounter].image = document.getElementById("empty-heart");
-	  lifeCounter++;
-	}
+	module.exports = Heart;
 
 /***/ }
 /******/ ]);
