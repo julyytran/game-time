@@ -75,8 +75,31 @@
 	var helpers = new Helpers();
 	var lastGenTime = 0;
 	var points = 0;
+	var speed = 3;
+	var lastSpeedIncrease = 0;
 
 	function Game() {}
+
+	Game.prototype.calculateSpawnTime = function (gameTimer) {
+	  var spawnTime = 3 / gameTimer;
+	  if (spawnTime < .4) {
+	    spawnTime = .4;
+	  }
+	  return spawnTime;
+	};
+
+	Game.prototype.calculateSpeed = function (gameTimer) {
+	  var timeSinceLastSpeedIncrease = (Date.now() - lastSpeedIncrease) / 1000;
+	  if (timeSinceLastSpeedIncrease > 10) {
+	    speed++;
+	    lastSpeedIncrease = Date.now();
+	  }
+	  if (speed > 10) {
+	    speed = 10;
+	  }
+	  console.log(speed);
+	  return speed;
+	};
 
 	Game.prototype.moveCat = function (event, nyanCat) {
 	  if (event.keyCode === 38) {
@@ -116,11 +139,11 @@
 	  }
 	};
 
-	Game.prototype.addSushi = function (nyanCat) {
+	Game.prototype.addSushi = function (nyanCat, gameTimer) {
 	  for (var i = 0; i < sushis.length; i++) {
 	    var currentSushi = sushis[i];
 	    currentSushi.draw();
-	    currentSushi.move(sushis, i);
+	    currentSushi.move(sushis, i, gameTimer);
 	    if (helpers.checkCollision(currentSushi, nyanCat)) {
 	      helpers.clearObject(sushis, i);
 	      points = helpers.addPoints(points, 30);
@@ -128,11 +151,11 @@
 	  }
 	};
 
-	Game.prototype.addTrash = function (nyanCat, hearts) {
+	Game.prototype.addTrash = function (nyanCat, hearts, speed) {
 	  for (var i = 0; i < trashes.length; i++) {
 	    var currentTrash = trashes[i];
 	    currentTrash.draw();
-	    currentTrash.move(trashes, i);
+	    currentTrash.move(trashes, i, speed);
 	    if (helpers.checkCollision(currentTrash, nyanCat)) {
 	      helpers.clearObject(trashes, i);
 	      lifeCounter = helpers.checkLoseHeart(lifeCounter, hearts, helpers);
@@ -178,8 +201,8 @@
 	  return this;
 	};
 
-	Sushi.prototype.move = function (sushis, index) {
-	  this.x -= 3;
+	Sushi.prototype.move = function (sushis, index, gameTimer) {
+	  this.x -= gameTimer;
 	  if (this.x < -70) {
 	    helpers.clearObject(sushis, index);
 	  }
@@ -213,7 +236,8 @@
 	};
 
 	Helpers.prototype.checkCollision = function (currentObject, nyanCat) {
-	  return nyanCat.x < currentObject.x + currentObject.width && nyanCat.x + nyanCat.width > currentObject.x && nyanCat.y < currentObject.y + currentObject.height && nyanCat.height + nyanCat.y > currentObject.y;
+	  return nyanCat.x < currentObject.x + currentObject.width && //make these variables
+	  nyanCat.x + nyanCat.width > currentObject.x && nyanCat.y < currentObject.y + currentObject.height && nyanCat.height + nyanCat.y > currentObject.y;
 	};
 
 	Helpers.prototype.checkLoseHeart = function (lifeCounter, hearts, helpers) {
@@ -249,8 +273,8 @@
 	  return this;
 	};
 
-	Trash.prototype.move = function (trashes, index) {
-	  this.x -= 3;
+	Trash.prototype.move = function (trashes, index, speed) {
+	  this.x -= speed;
 	  if (this.x < -70) {
 	    helpers.clearObject(trashes, index);
 	  }
@@ -8841,14 +8865,26 @@
 	var Helpers = __webpack_require__(3);
 	var Cat = __webpack_require__(6);
 	var Sushi = __webpack_require__(2);
+	var Heart = __webpack_require__(5);
 
 	describe("Helpers", function () {
 	  var helpers = new Helpers();
+
 	  it("should remove objects from array", function () {
 	    var sushis = [1, 2, 3, 4];
 	    var result = helpers.clearObject(sushis, 1);
 	    var expected = [1, 3, 4];
 	    assert.equal(result[1], expected[1]);
+	  });
+
+	  it("should increase lifeCounter and change heart image", function () {
+	    var heart1 = new Heart(500, { context: "test" });
+	    var heart2 = new Heart(550, { context: "test" });
+	    var heart3 = new Heart(600, { context: "test" });
+	    var hearts = [heart1, heart2, heart3];
+	    var lifeCounter = 0;
+	    var returnedLifeCounter = helpers.loseHeart(hearts, lifeCounter);
+	    assert.equal(returnedLifeCounter, 1);
 	  });
 
 	  context("collision detection", function () {
@@ -8870,6 +8906,11 @@
 	      var sushi = new Sushi({ context: "test" });
 	      var expected = helpers.checkCollision(sushi, cat);
 	      assert.equal(expected, false);
+	    });
+
+	    it('should add points and return new points', function () {
+	      var points = helpers.addPoints(0, 30);
+	      assert.equal(points, 30);
 	    });
 	  });
 	});
