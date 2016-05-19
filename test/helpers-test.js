@@ -47,9 +47,31 @@ describe("Helpers", function() {
       assert.equal(expected, false);
     });
 
-    it ('should add points and return new points', function() {
+    it('should add points and return new points', function() {
       var points = helpers.addPoints(0, 30);
       assert.equal(points, 30)
+    });
+
+    it('should check player should lose heart', function() {
+      var heart1 = new Heart(500, {context: "test"});
+      var heart2 = new Heart(550, {context: "test"});
+      var heart3 = new Heart(600, {context: "test"});
+      var hearts = [heart1, heart2, heart3];
+      var lifeCounter = 0;
+
+      var actual = helpers.checkLoseHeart(lifeCounter, hearts);
+      assert.equal(actual, 1);
+    });
+
+    it('should check player should lose heart', function() {
+      var heart1 = new Heart(500, {context: "test"});
+      var heart2 = new Heart(550, {context: "test"});
+      var heart3 = new Heart(600, {context: "test"});
+      var hearts = [heart1, heart2, heart3];
+      var lifeCounter = 4;
+
+      var actual = helpers.checkLoseHeart(lifeCounter, hearts);
+      assert.equal(actual, undefined);
     });
   });
 });

@@ -87,7 +87,7 @@
 	  var now = Date.now();
 	  var gameTimer = (now - startTime) / 1000;
 
-	  var speed = game.calculateSpeed(gameTimer);
+	  var speed = game.calculateSpeed(Date.now());
 
 	  var spawnTime = game.calculateSpawnTime(gameTimer);
 
@@ -124,14 +124,14 @@
 
 	Game.prototype.calculateSpawnTime = function (gameTimer) {
 	  var spawnTime = 3 / gameTimer;
-	  if (spawnTime < .4) {
-	    spawnTime = .4;
+	  if (spawnTime < 0.4) {
+	    spawnTime = 0.4;
 	  }
 	  return spawnTime;
 	};
 
-	Game.prototype.calculateSpeed = function (gameTimer) {
-	  var timeSinceLastSpeedIncrease = (Date.now() - lastSpeedIncrease) / 1000;
+	Game.prototype.calculateSpeed = function (time) {
+	  var timeSinceLastSpeedIncrease = (time - lastSpeedIncrease) / 1000;
 	  if (timeSinceLastSpeedIncrease > 10) {
 	    speed++;
 	    lastSpeedIncrease = Date.now();
@@ -139,7 +139,6 @@
 	  if (speed > 10) {
 	    speed = 10;
 	  }
-	  console.log(speed);
 	  return speed;
 	};
 

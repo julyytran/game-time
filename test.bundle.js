@@ -82,14 +82,14 @@
 
 	Game.prototype.calculateSpawnTime = function (gameTimer) {
 	  var spawnTime = 3 / gameTimer;
-	  if (spawnTime < .4) {
-	    spawnTime = .4;
+	  if (spawnTime < 0.4) {
+	    spawnTime = 0.4;
 	  }
 	  return spawnTime;
 	};
 
-	Game.prototype.calculateSpeed = function (gameTimer) {
-	  var timeSinceLastSpeedIncrease = (Date.now() - lastSpeedIncrease) / 1000;
+	Game.prototype.calculateSpeed = function (time) {
+	  var timeSinceLastSpeedIncrease = (time - lastSpeedIncrease) / 1000;
 	  if (timeSinceLastSpeedIncrease > 10) {
 	    speed++;
 	    lastSpeedIncrease = Date.now();
@@ -97,7 +97,6 @@
 	  if (speed > 10) {
 	    speed = 10;
 	  }
-	  console.log(speed);
 	  return speed;
 	};
 
@@ -362,8 +361,8 @@
 	// Hot Module Replacement
 	if(false) {
 		// When the styles change, update the <style> tags
-		module.hot.accept("!!/Users/chelseajohnson/Documents/turing/4module/game-time/node_modules/mocha-loader/node_modules/css-loader/index.js!/Users/chelseajohnson/Documents/turing/4module/game-time/node_modules/mocha/mocha.css", function() {
-			var newContent = require("!!/Users/chelseajohnson/Documents/turing/4module/game-time/node_modules/mocha-loader/node_modules/css-loader/index.js!/Users/chelseajohnson/Documents/turing/4module/game-time/node_modules/mocha/mocha.css");
+		module.hot.accept("!!/Users/July/turing/4module/projects/game-time/node_modules/mocha-loader/node_modules/css-loader/index.js!/Users/July/turing/4module/projects/game-time/node_modules/mocha/mocha.css", function() {
+			var newContent = require("!!/Users/July/turing/4module/projects/game-time/node_modules/mocha-loader/node_modules/css-loader/index.js!/Users/July/turing/4module/projects/game-time/node_modules/mocha/mocha.css");
 			if(typeof newContent === 'string') newContent = [[module.id, newContent, '']];
 			update(newContent);
 		});
@@ -8793,8 +8792,10 @@
 	    });
 	  });
 	  context("within game", function () {
+	    var sushis = [new Sushi({ context: "test" }), new Sushi({ context: "test" }), new Sushi({ context: "test" })];
+	    var gameTimer = 3;
 	    it('should move left', function () {
-	      sushi.move();
+	      sushi.move(sushis, 1, gameTimer);
 	      assert.equal(sushi.x, 597);
 	    });
 	  });
@@ -8825,8 +8826,10 @@
 	    });
 	  });
 	  context("within game", function () {
+	    var trashes = [new Trash({ context: "test" }), new Trash({ context: "test" }), new Trash({ context: "test" })];
+	    var gameTimer = 3;
 	    it('should move left', function () {
-	      trash.move();
+	      trash.move(trashes, 1, gameTimer);
 	      assert.equal(trash.x, 597);
 	    });
 	  });
@@ -8849,6 +8852,23 @@
 	    it('should make a new sushi or trash object', function () {
 	      var newObject = game.makeObject();
 	      assert.equal(typeof newObject, "object");
+	    });
+	  });
+	  context("increases in difficulty", function () {
+	    it("should calculate spawn time", function () {
+	      var gameTimer = 3;
+	      var actual = game.calculateSpawnTime(gameTimer);
+	      assert.equal(actual, 1);
+	    });
+	    it("has cap for spawn time", function () {
+	      var gameTimer = 10;
+	      var actual = game.calculateSpawnTime(gameTimer);
+	      assert.equal(actual, 0.4);
+	    });
+	    it("should calculate speed", function () {
+	      var time = 1463697612806;
+	      var actual = game.calculateSpeed(time);
+	      assert.equal(actual, 4);
 	    });
 	  });
 	});
