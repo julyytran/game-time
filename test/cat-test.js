@@ -3,7 +3,7 @@ const assert = chai.assert;
 
 const Cat = require('../lib/cat');
 
-describe("Cat", function(){
+describe("Cat", function() {
   var cat = new Cat({context: "test"});
   context("with default attributes", function() {
     it('should assign default values', function() {

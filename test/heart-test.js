@@ -3,7 +3,7 @@ const assert = chai.assert;
 
 const Heart = require('../lib/heart');
 
-describe("Heart", function(){
+describe("Heart", function() {
   context("with default attributes", function() {
     var heart = new Heart(10, {context: "test"});
 

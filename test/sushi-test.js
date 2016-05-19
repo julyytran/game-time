@@ -3,7 +3,7 @@ const assert = chai.assert;
 
 const Sushi = require('../lib/sushi');
 
-describe("Sushi", function(){
+describe("Sushi", function() {
   var sushi = new Sushi({context: "test"});
   context("with default attributes", function() {
     it('should assign default values', function() {
@@ -18,8 +18,8 @@ describe("Sushi", function(){
   });
   context("within game", function() {
     it('should move left', function() {
-      sushi.move()
-      assert.equal(sushi.x, 597)
+      sushi.move();
+      assert.equal(sushi.x, 597);
     });
   });
 });

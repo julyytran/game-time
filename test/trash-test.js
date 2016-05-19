@@ -3,7 +3,7 @@ const assert = chai.assert;
 
 const Trash = require('../lib/trash');
 
-describe("Trash", function(){
+describe("Trash", function() {
   var trash = new Trash({context: "test"});
   context("with default attributes", function() {
     it('should assign default values', function() {
@@ -18,8 +18,8 @@ describe("Trash", function(){
   });
   context("within game", function() {
     it('should move left', function() {
-      trash.move()
-      assert.equal(trash.x, 597)
+      trash.move();
+      assert.equal(trash.x, 597);
     });
   });
 });
