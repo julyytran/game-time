@@ -199,7 +199,7 @@
 	    currentTrash.move(trashes, i, speed);
 	    if (helpers.checkCollision(currentTrash, nyanCat)) {
 	      helpers.clearObject(trashes, i);
-	      lifeCounter = helpers.checkLoseHeart(lifeCounter, hearts, helpers);
+	      lifeCounter = helpers.checkLoseHeart(lifeCounter, hearts);
 	    }
 	  }
 	};
@@ -281,9 +281,9 @@
 	  nyanCat.x + nyanCat.width > currentObject.x && nyanCat.y < currentObject.y + currentObject.height && nyanCat.height + nyanCat.y > currentObject.y;
 	};
 
-	Helpers.prototype.checkLoseHeart = function (lifeCounter, hearts, helpers) {
+	Helpers.prototype.checkLoseHeart = function (lifeCounter, hearts) {
 	  if (lifeCounter < 3) {
-	    return lifeCounter = helpers.loseHeart(hearts, lifeCounter);
+	    return lifeCounter = this.loseHeart(hearts, lifeCounter);
 	  };
 	};
 

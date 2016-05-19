@@ -157,7 +157,7 @@
 	    currentTrash.move(trashes, i, speed);
 	    if (helpers.checkCollision(currentTrash, nyanCat)) {
 	      helpers.clearObject(trashes, i);
-	      lifeCounter = helpers.checkLoseHeart(lifeCounter, hearts, helpers);
+	      lifeCounter = helpers.checkLoseHeart(lifeCounter, hearts);
 	    }
 	  }
 	};
@@ -239,9 +239,9 @@
 	  nyanCat.x + nyanCat.width > currentObject.x && nyanCat.y < currentObject.y + currentObject.height && nyanCat.height + nyanCat.y > currentObject.y;
 	};
 
-	Helpers.prototype.checkLoseHeart = function (lifeCounter, hearts, helpers) {
+	Helpers.prototype.checkLoseHeart = function (lifeCounter, hearts) {
 	  if (lifeCounter < 3) {
-	    return lifeCounter = helpers.loseHeart(hearts, lifeCounter);
+	    return lifeCounter = this.loseHeart(hearts, lifeCounter);
 	  };
 	};
 
@@ -8931,6 +8931,28 @@
 	    it('should add points and return new points', function () {
 	      var points = helpers.addPoints(0, 30);
 	      assert.equal(points, 30);
+	    });
+
+	    it('should check player should lose heart', function () {
+	      var heart1 = new Heart(500, { context: "test" });
+	      var heart2 = new Heart(550, { context: "test" });
+	      var heart3 = new Heart(600, { context: "test" });
+	      var hearts = [heart1, heart2, heart3];
+	      var lifeCounter = 0;
+
+	      var actual = helpers.checkLoseHeart(lifeCounter, hearts);
+	      assert.equal(actual, 1);
+	    });
+
+	    it('should check player should lose heart', function () {
+	      var heart1 = new Heart(500, { context: "test" });
+	      var heart2 = new Heart(550, { context: "test" });
+	      var heart3 = new Heart(600, { context: "test" });
+	      var hearts = [heart1, heart2, heart3];
+	      var lifeCounter = 4;
+
+	      var actual = helpers.checkLoseHeart(lifeCounter, hearts);
+	      assert.equal(actual, undefined);
 	    });
 	  });
 	});
