@@ -7,6 +7,13 @@ const Sushi= require('../lib/sushi')
 
 describe("Helpers", function(){
   var helpers = new Helpers();
+  it("should remove objects from array", function(){
+    var sushis = [1, 2, 3, 4]
+    var result = helpers.clearObject(sushis, 1);
+    var expected = [1, 3, 4]
+    assert.equal(result[1], expected[1])
+  });
+  
   context("collision detection", function() {
     it('should return true if objects overlap', function() {
       var cat = new Cat({context: "test"})

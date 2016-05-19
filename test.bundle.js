@@ -47,7 +47,7 @@
 	__webpack_require__(7);
 	mocha.setup("bdd");
 	__webpack_require__(15)
-	__webpack_require__(60);
+	__webpack_require__(62);
 	if(false) {
 		module.hot.accept();
 		module.hot.dispose(function() {
@@ -60,35 +60,106 @@
 	}
 
 /***/ },
-/* 1 */,
-/* 2 */
-/***/ function(module, exports) {
-
-	"use strict";
-
-	function Cat(options) {
-	  this.image = document.getElementById("nyan-cat-image");
-	  this.width = 100;
-	  this.height = 100;
-	  this.x = 10;
-	  this.y = 50;
-	  this.context = options.context || {};
-	}
-
-	Cat.prototype.draw = function () {
-	  this.context.drawImage(this.image, this.x, this.y);
-	  return this;
-	};
-
-	module.exports = Cat;
-
-/***/ },
-/* 3 */
+/* 1 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
 
-	var Helpers = __webpack_require__(4);
+	var lifeCounter = 0;
+	var Sushi = __webpack_require__(2);
+	var Trash = __webpack_require__(4);
+	var Helpers = __webpack_require__(3);
+
+	var sushis = [];
+	var trashes = [];
+	var helpers = new Helpers();
+	var lastGenTime = 0;
+	var points = 0;
+
+	function Game() {}
+
+	Game.prototype.moveCat = function (event, nyanCat) {
+	  if (event.keyCode === 38) {
+	    nyanCat.moveUp();
+	  } else if (event.keyCode === 40) {
+	    nyanCat.moveDown();
+	  }
+	};
+
+	Game.prototype.clearCanvas = function (context, canvas) {
+	  context.clearRect(0, 0, canvas.width, canvas.height);
+	};
+
+	Game.prototype.drawHeartsAndCat = function (context, nyanCat, hearts) {
+	  nyanCat.draw();
+	  for (var i = 0; i < hearts.length; i++) {
+	    hearts[i].draw();
+	  }
+	};
+
+	Game.prototype.writePoints = function (context) {
+	  context.font = "30px Comic Sans MS";
+	  context.fillStyle = "magenta";
+	  context.fillText("Points: " + points, 20, 40);
+	};
+
+	Game.prototype.makeObject = function (context) {
+	  var number = Math.random();
+	  if (number > 0.5) {
+	    var sushi = new Sushi({ context: context });
+	    sushis.push(sushi);
+	    return sushi;
+	  } else {
+	    var trash = new Trash({ context: context });
+	    trashes.push(trash);
+	    return trash;
+	  }
+	};
+
+	Game.prototype.addSushi = function (nyanCat) {
+	  for (var i = 0; i < sushis.length; i++) {
+	    var currentSushi = sushis[i];
+	    currentSushi.draw();
+	    currentSushi.move(sushis, i);
+	    if (helpers.checkCollision(currentSushi, nyanCat)) {
+	      helpers.clearObject(sushis, i);
+	      points = helpers.addPoints(points, 30);
+	    }
+	  }
+	};
+
+	Game.prototype.addTrash = function (nyanCat, hearts) {
+	  for (var i = 0; i < trashes.length; i++) {
+	    var currentTrash = trashes[i];
+	    currentTrash.draw();
+	    currentTrash.move(trashes, i);
+	    if (helpers.checkCollision(currentTrash, nyanCat)) {
+	      helpers.clearObject(trashes, i);
+	      lifeCounter = helpers.checkLoseHeart(lifeCounter, hearts, helpers);
+	    }
+	  }
+	};
+
+	Game.prototype.determineContinue = function (gameLoop, context, heart3) {
+	  if (lifeCounter < 3) {
+	    requestAnimationFrame(gameLoop);
+	  } else {
+	    heart3.image = document.getElementById("empty-heart");
+	    heart3.draw();
+	    var gameOver = document.getElementById("game-over");
+	    context.drawImage(gameOver, 200, 200);
+	  }
+	};
+
+	module.exports = Game;
+
+/***/ },
+/* 2 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+
+	var Helpers = __webpack_require__(3);
 	var helpers = new Helpers();
 
 	function Sushi(options) {
@@ -118,7 +189,7 @@
 	module.exports = Sushi;
 
 /***/ },
-/* 4 */
+/* 3 */
 /***/ function(module, exports) {
 
 	"use strict";
@@ -127,6 +198,7 @@
 
 	Helpers.prototype.clearObject = function (collection, index) {
 	  collection.splice(index, 1);
+	  return collection;
 	};
 
 	Helpers.prototype.addPoints = function (points, addedPoints) {
@@ -140,8 +212,8 @@
 	  return lifeCounter;
 	};
 
-	Helpers.prototype.checkCollision = function (currentSushi, nyanCat) {
-	  return nyanCat.x < currentSushi.x + currentSushi.width && nyanCat.x + nyanCat.width > currentSushi.x && nyanCat.y < currentSushi.y + currentSushi.height && nyanCat.height + nyanCat.y > currentSushi.y;
+	Helpers.prototype.checkCollision = function (currentObject, nyanCat) {
+	  return nyanCat.x < currentObject.x + currentObject.width && nyanCat.x + nyanCat.width > currentObject.x && nyanCat.y < currentObject.y + currentObject.height && nyanCat.height + nyanCat.y > currentObject.y;
 	};
 
 	Helpers.prototype.checkLoseHeart = function (lifeCounter, hearts, helpers) {
@@ -153,12 +225,12 @@
 	module.exports = Helpers;
 
 /***/ },
-/* 5 */
+/* 4 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
 
-	var Helpers = __webpack_require__(4);
+	var Helpers = __webpack_require__(3);
 	var helpers = new Helpers();
 
 	function Trash(options) {
@@ -188,7 +260,7 @@
 	module.exports = Trash;
 
 /***/ },
-/* 6 */
+/* 5 */
 /***/ function(module, exports) {
 
 	"use strict";
@@ -208,6 +280,39 @@
 	};
 
 	module.exports = Heart;
+
+/***/ },
+/* 6 */
+/***/ function(module, exports) {
+
+	"use strict";
+
+	var catDrawMinY = 50;
+	var catDrawMaxY = 350;
+
+	function Cat(options) {
+	  this.image = document.getElementById("nyan-cat-image");
+	  this.width = 100;
+	  this.height = 100;
+	  this.x = 10;
+	  this.y = 50;
+	  this.context = options.context || {};
+	}
+
+	Cat.prototype.draw = function () {
+	  this.context.drawImage(this.image, this.x, this.y);
+	  return this;
+	};
+
+	Cat.prototype.moveUp = function () {
+	  this.y = Math.max(catDrawMinY, this.y - this.height);
+	};
+
+	Cat.prototype.moveDown = function () {
+	  this.y = Math.min(catDrawMaxY, this.y + this.height);
+	};
+
+	module.exports = Cat;
 
 /***/ },
 /* 7 */
@@ -503,6 +608,8 @@
 	__webpack_require__(57);
 	__webpack_require__(58);
 	__webpack_require__(59);
+	__webpack_require__(60);
+	__webpack_require__(61);
 
 /***/ },
 /* 16 */
@@ -513,18 +620,30 @@
 	var chai = __webpack_require__(17);
 	var assert = chai.assert;
 
-	var Cat = __webpack_require__(2);
+	var Cat = __webpack_require__(6);
 
 	describe("Cat", function () {
+	  var cat = new Cat({ context: "test" });
 	  context("with default attributes", function () {
-	    var cat = new Cat({ context: "test" });
-
 	    it('should assign default values', function () {
 	      assert.equal(cat.x, 10);
 	      assert.equal(cat.y, 50);
 	      assert.equal(cat.width, 100);
 	      assert.equal(cat.height, 100);
 	      assert.equal(cat.context, "test");
+	    });
+	  });
+	  context("within game", function () {
+	    it('should decrease y when moving up', function () {
+	      cat.y = 150;
+	      cat.moveUp();
+	      assert.equal(cat.y, 50);
+	    });
+
+	    it('should increase y when moving down', function () {
+	      assert.equal(cat.y, 50);
+	      cat.moveDown();
+	      assert.equal(cat.y, 150);
 	    });
 	  });
 	});
@@ -8609,7 +8728,7 @@
 	var chai = __webpack_require__(17);
 	var assert = chai.assert;
 
-	var Heart = __webpack_require__(6);
+	var Heart = __webpack_require__(5);
 
 	describe("Heart", function () {
 	  context("with default attributes", function () {
@@ -8634,12 +8753,11 @@
 	var chai = __webpack_require__(17);
 	var assert = chai.assert;
 
-	var Sushi = __webpack_require__(3);
+	var Sushi = __webpack_require__(2);
 
 	describe("Sushi", function () {
+	  var sushi = new Sushi({ context: "test" });
 	  context("with default attributes", function () {
-	    var sushi = new Sushi({ context: "test" });
-
 	    it('should assign default values', function () {
 	      var rowsForSprites = [70, 170, 270, 370];
 
@@ -8649,10 +8767,12 @@
 	      assert.equal(sushi.height, 58);
 	      assert.equal(sushi.context, "test");
 	    });
-
-	    // it('should move left', function() {
-	    //   sushi.move
-	    // });
+	  });
+	  context("within game", function () {
+	    it('should move left', function () {
+	      sushi.move();
+	      assert.equal(sushi.x, 597);
+	    });
 	  });
 	});
 
@@ -8665,12 +8785,11 @@
 	var chai = __webpack_require__(17);
 	var assert = chai.assert;
 
-	var Trash = __webpack_require__(5);
+	var Trash = __webpack_require__(4);
 
 	describe("Trash", function () {
+	  var trash = new Trash({ context: "test" });
 	  context("with default attributes", function () {
-	    var trash = new Trash({ context: "test" });
-
 	    it('should assign default values', function () {
 	      var rowsForTrash = [70, 170, 270, 370];
 
@@ -8681,10 +8800,82 @@
 	      assert.equal(trash.context, "test");
 	    });
 	  });
+	  context("within game", function () {
+	    it('should move left', function () {
+	      trash.move();
+	      assert.equal(trash.x, 597);
+	    });
+	  });
 	});
 
 /***/ },
 /* 60 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+
+	var chai = __webpack_require__(17);
+	var assert = chai.assert;
+
+	var Game = __webpack_require__(1);
+
+	describe("Game", function () {
+	  var game = new Game();
+	  context("make object", function () {
+	    it('should make a new sushi or trash object', function () {
+	      var newObject = game.makeObject();
+	      assert.equal(typeof newObject, "object");
+	    });
+	  });
+	});
+
+/***/ },
+/* 61 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+
+	var chai = __webpack_require__(17);
+	var assert = chai.assert;
+
+	var Helpers = __webpack_require__(3);
+	var Cat = __webpack_require__(6);
+	var Sushi = __webpack_require__(2);
+
+	describe("Helpers", function () {
+	  var helpers = new Helpers();
+	  it("should remove objects from array", function () {
+	    var sushis = [1, 2, 3, 4];
+	    var result = helpers.clearObject(sushis, 1);
+	    var expected = [1, 3, 4];
+	    assert.equal(result[1], expected[1]);
+	  });
+
+	  context("collision detection", function () {
+	    it('should return true if objects overlap', function () {
+	      var cat = new Cat({ context: "test" });
+	      var sushi = new Sushi({ context: "test" });
+	      var initial = helpers.checkCollision(sushi, cat);
+	      assert.equal(initial, false);
+	      cat.x = 50;
+	      cat.y = 50;
+	      sushi.y = 50;
+	      sushi.x = 50;
+	      var expected = helpers.checkCollision(sushi, cat);
+	      assert.equal(expected, true);
+	    });
+
+	    it('should return false if values do not overlap', function () {
+	      var cat = new Cat({ context: "test" });
+	      var sushi = new Sushi({ context: "test" });
+	      var expected = helpers.checkCollision(sushi, cat);
+	      assert.equal(expected, false);
+	    });
+	  });
+	});
+
+/***/ },
+/* 62 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/* WEBPACK VAR INJECTION */(function(process) {process.nextTick(function() {
@@ -8695,10 +8886,10 @@
 			mocha.run();
 	});
 
-	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(61)))
+	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(63)))
 
 /***/ },
-/* 61 */
+/* 63 */
 /***/ function(module, exports) {
 
 	// shim for using process in browser
