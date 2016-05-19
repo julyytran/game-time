@@ -8,7 +8,7 @@ describe("Game", function(){
   context("make object", function() {
     it('should make a new sushi or trash object', function() {
       var newObject = game.makeObject()
-      assert.equal(newObject.constructor.name, "Sushi" || "Trash")
+      assert.equal(typeof newObject, "object")
     });
   });
 });
