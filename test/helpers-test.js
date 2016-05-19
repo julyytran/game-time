@@ -46,5 +46,10 @@ describe("Helpers", function() {
       var expected = helpers.checkCollision(sushi, cat);
       assert.equal(expected, false);
     });
+
+    it ('should add points and return new points', function() {
+      var points = helpers.addPoints(0, 30);
+      assert.equal(points, 30)
+    });
   });
 });
