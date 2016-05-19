@@ -75,8 +75,30 @@
 	var helpers = new Helpers();
 	var lastGenTime = 0;
 	var points = 0;
+	var speed = 3;
+	var lastSpeedIncrease = 0;
 
 	function Game() {}
+
+	Game.prototype.calculateSpawnTime = function (gameTimer) {
+	  var spawnTime = 3 / gameTimer;
+	  if (spawnTime < 0.4) {
+	    spawnTime = 0.4;
+	  }
+	  return spawnTime;
+	};
+
+	Game.prototype.calculateSpeed = function (time) {
+	  var timeSinceLastSpeedIncrease = (time - lastSpeedIncrease) / 1000;
+	  if (timeSinceLastSpeedIncrease > 10) {
+	    speed++;
+	    lastSpeedIncrease = Date.now();
+	  }
+	  if (speed > 10) {
+	    speed = 10;
+	  }
+	  return speed;
+	};
 
 	Game.prototype.moveCat = function (event, nyanCat) {
 	  if (event.keyCode === 38) {
@@ -116,11 +138,11 @@
 	  }
 	};
 
-	Game.prototype.addSushi = function (nyanCat) {
+	Game.prototype.addSushi = function (nyanCat, gameTimer) {
 	  for (var i = 0; i < sushis.length; i++) {
 	    var currentSushi = sushis[i];
 	    currentSushi.draw();
-	    currentSushi.move(sushis, i);
+	    currentSushi.move(sushis, i, gameTimer);
 	    if (helpers.checkCollision(currentSushi, nyanCat)) {
 	      helpers.clearObject(sushis, i);
 	      points = helpers.addPoints(points, 30);
@@ -128,14 +150,14 @@
 	  }
 	};
 
-	Game.prototype.addTrash = function (nyanCat, hearts) {
+	Game.prototype.addTrash = function (nyanCat, hearts, speed) {
 	  for (var i = 0; i < trashes.length; i++) {
 	    var currentTrash = trashes[i];
 	    currentTrash.draw();
-	    currentTrash.move(trashes, i);
+	    currentTrash.move(trashes, i, speed);
 	    if (helpers.checkCollision(currentTrash, nyanCat)) {
 	      helpers.clearObject(trashes, i);
-	      lifeCounter = helpers.checkLoseHeart(lifeCounter, hearts, helpers);
+	      lifeCounter = helpers.checkLoseHeart(lifeCounter, hearts);
 	    }
 	  }
 	};
@@ -178,8 +200,8 @@
 	  return this;
 	};
 
-	Sushi.prototype.move = function (sushis, index) {
-	  this.x -= 3;
+	Sushi.prototype.move = function (sushis, index, gameTimer) {
+	  this.x -= gameTimer;
 	  if (this.x < -70) {
 	    helpers.clearObject(sushis, index);
 	  }
@@ -213,12 +235,13 @@
 	};
 
 	Helpers.prototype.checkCollision = function (currentObject, nyanCat) {
-	  return nyanCat.x < currentObject.x + currentObject.width && nyanCat.x + nyanCat.width > currentObject.x && nyanCat.y < currentObject.y + currentObject.height && nyanCat.height + nyanCat.y > currentObject.y;
+	  return nyanCat.x < currentObject.x + currentObject.width && //make these variables
+	  nyanCat.x + nyanCat.width > currentObject.x && nyanCat.y < currentObject.y + currentObject.height && nyanCat.height + nyanCat.y > currentObject.y;
 	};
 
-	Helpers.prototype.checkLoseHeart = function (lifeCounter, hearts, helpers) {
+	Helpers.prototype.checkLoseHeart = function (lifeCounter, hearts) {
 	  if (lifeCounter < 3) {
-	    return lifeCounter = helpers.loseHeart(hearts, lifeCounter);
+	    return lifeCounter = this.loseHeart(hearts, lifeCounter);
 	  };
 	};
 
@@ -249,8 +272,8 @@
 	  return this;
 	};
 
-	Trash.prototype.move = function (trashes, index) {
-	  this.x -= 3;
+	Trash.prototype.move = function (trashes, index, speed) {
+	  this.x -= speed;
 	  if (this.x < -70) {
 	    helpers.clearObject(trashes, index);
 	  }
@@ -338,8 +361,8 @@
 	// Hot Module Replacement
 	if(false) {
 		// When the styles change, update the <style> tags
-		module.hot.accept("!!/Users/chelseajohnson/Documents/turing/4module/game-time/node_modules/mocha-loader/node_modules/css-loader/index.js!/Users/chelseajohnson/Documents/turing/4module/game-time/node_modules/mocha/mocha.css", function() {
-			var newContent = require("!!/Users/chelseajohnson/Documents/turing/4module/game-time/node_modules/mocha-loader/node_modules/css-loader/index.js!/Users/chelseajohnson/Documents/turing/4module/game-time/node_modules/mocha/mocha.css");
+		module.hot.accept("!!/Users/July/turing/4module/projects/game-time/node_modules/mocha-loader/node_modules/css-loader/index.js!/Users/July/turing/4module/projects/game-time/node_modules/mocha/mocha.css", function() {
+			var newContent = require("!!/Users/July/turing/4module/projects/game-time/node_modules/mocha-loader/node_modules/css-loader/index.js!/Users/July/turing/4module/projects/game-time/node_modules/mocha/mocha.css");
 			if(typeof newContent === 'string') newContent = [[module.id, newContent, '']];
 			update(newContent);
 		});
@@ -8769,8 +8792,10 @@
 	    });
 	  });
 	  context("within game", function () {
+	    var sushis = [new Sushi({ context: "test" }), new Sushi({ context: "test" }), new Sushi({ context: "test" })];
+	    var gameTimer = 3;
 	    it('should move left', function () {
-	      sushi.move();
+	      sushi.move(sushis, 1, gameTimer);
 	      assert.equal(sushi.x, 597);
 	    });
 	  });
@@ -8801,8 +8826,10 @@
 	    });
 	  });
 	  context("within game", function () {
+	    var trashes = [new Trash({ context: "test" }), new Trash({ context: "test" }), new Trash({ context: "test" })];
+	    var gameTimer = 3;
 	    it('should move left', function () {
-	      trash.move();
+	      trash.move(trashes, 1, gameTimer);
 	      assert.equal(trash.x, 597);
 	    });
 	  });
@@ -8827,6 +8854,23 @@
 	      assert.equal(typeof newObject, "object");
 	    });
 	  });
+	  context("increases in difficulty", function () {
+	    it("should calculate spawn time", function () {
+	      var gameTimer = 3;
+	      var actual = game.calculateSpawnTime(gameTimer);
+	      assert.equal(actual, 1);
+	    });
+	    it("has cap for spawn time", function () {
+	      var gameTimer = 10;
+	      var actual = game.calculateSpawnTime(gameTimer);
+	      assert.equal(actual, 0.4);
+	    });
+	    it("should calculate speed", function () {
+	      var time = 1463697612806;
+	      var actual = game.calculateSpeed(time);
+	      assert.equal(actual, 4);
+	    });
+	  });
 	});
 
 /***/ },
@@ -8841,14 +8885,26 @@
 	var Helpers = __webpack_require__(3);
 	var Cat = __webpack_require__(6);
 	var Sushi = __webpack_require__(2);
+	var Heart = __webpack_require__(5);
 
 	describe("Helpers", function () {
 	  var helpers = new Helpers();
+
 	  it("should remove objects from array", function () {
 	    var sushis = [1, 2, 3, 4];
 	    var result = helpers.clearObject(sushis, 1);
 	    var expected = [1, 3, 4];
 	    assert.equal(result[1], expected[1]);
+	  });
+
+	  it("should increase lifeCounter and change heart image", function () {
+	    var heart1 = new Heart(500, { context: "test" });
+	    var heart2 = new Heart(550, { context: "test" });
+	    var heart3 = new Heart(600, { context: "test" });
+	    var hearts = [heart1, heart2, heart3];
+	    var lifeCounter = 0;
+	    var returnedLifeCounter = helpers.loseHeart(hearts, lifeCounter);
+	    assert.equal(returnedLifeCounter, 1);
 	  });
 
 	  context("collision detection", function () {
@@ -8870,6 +8926,33 @@
 	      var sushi = new Sushi({ context: "test" });
 	      var expected = helpers.checkCollision(sushi, cat);
 	      assert.equal(expected, false);
+	    });
+
+	    it('should add points and return new points', function () {
+	      var points = helpers.addPoints(0, 30);
+	      assert.equal(points, 30);
+	    });
+
+	    it('should check player should lose heart', function () {
+	      var heart1 = new Heart(500, { context: "test" });
+	      var heart2 = new Heart(550, { context: "test" });
+	      var heart3 = new Heart(600, { context: "test" });
+	      var hearts = [heart1, heart2, heart3];
+	      var lifeCounter = 0;
+
+	      var actual = helpers.checkLoseHeart(lifeCounter, hearts);
+	      assert.equal(actual, 1);
+	    });
+
+	    it('should check player should lose heart', function () {
+	      var heart1 = new Heart(500, { context: "test" });
+	      var heart2 = new Heart(550, { context: "test" });
+	      var heart3 = new Heart(600, { context: "test" });
+	      var hearts = [heart1, heart2, heart3];
+	      var lifeCounter = 4;
+
+	      var actual = helpers.checkLoseHeart(lifeCounter, hearts);
+	      assert.equal(actual, undefined);
 	    });
 	  });
 	});
