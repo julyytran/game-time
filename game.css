@@ -1,34 +1,39 @@
-#nyan-cat-image {
-  display: none;
-}
- #roe-roll{
-   display: none;
- }
-
- #fish-roll{
-   display: none;
- }
-
- #egg-roll{
-   display: none;
- }
-
-#kawaii-poop {
-  display: none;
-}
-
-#kawaii-toaster {
-  display: none;
-}
-
 #empty-heart {
-  display: none;
-}
-
-#full-heart {
   display: none;
 }
 
 #game-over {
   display: none;
+}
+
+#nyan-cat-image {
+  display: none;
+}
+
+canvas {
+  padding-left: 0;
+  padding-right: 0;
+  margin-left: auto;
+  margin-right: auto;
+  display: block;
+  /*width: 800px;*/
+  display: none;
+}
+
+#start-screen{
+  text-align: center;
+  margin: auto;
+  background-image: url("images/background.jpg");
+  color: white;
+}
+
+/*h5 {
+  background-color: #003466;
+}*/
+
+/*h1 {
+  background-color: #003466;
+}*/
+.highlight {
+  background-color: #003466;
 }
