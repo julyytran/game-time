@@ -50,8 +50,8 @@
 	var context = canvas.getContext('2d');
 
 	var Game = __webpack_require__(1);
-	var Heart = __webpack_require__(5);
-	var Cat = __webpack_require__(6);
+	var Heart = __webpack_require__(6);
+	var Cat = __webpack_require__(7);
 
 	var game = new Game();
 	var nyanCat = new Cat({ context: context });
@@ -61,24 +61,10 @@
 	var hearts = [heart1, heart2, heart3];
 	var lastGenTime = 0;
 	var startTime = Date.now();
-	// var lastSpeedIncrease = 0
 
 	$(document).on('keydown', function (event) {
 	  game.moveCat(event, nyanCat);
 	});
-
-	// function calculateSpeed(gameTimer){
-	//   var timeSinceLastSpeedIncrease = (Date.now() - lastSpeedIncrease)/1000
-	//   if (timeSinceLastSpeedIncrease > 10){
-	//     speed++
-	//     lastSpeedIncrease = Date.now()
-	//   }
-	//   if (speed > 10){
-	//     speed = 10
-	//   }
-	//   console.log(speed)
-	//   return speed
-	// }
 
 	requestAnimationFrame(function gameLoop() {
 	  game.clearCanvas(context, canvas);
@@ -87,17 +73,19 @@
 	  var now = Date.now();
 	  var gameTimer = (now - startTime) / 1000;
 
-	  var speed = game.calculateSpeed(Date.now());
+	  var speed = game.calculateSpeed(0.07, 3, 10, gameTimer);
 
-	  var spawnTime = game.calculateSpawnTime(gameTimer);
+	  var spawnTime = game.calculateSpawnTime(-0.05, 0.2, 2.5, gameTimer);
+
+	  console.log("spawn time" + spawnTime);
+	  console.log("speed" + speed);
 
 	  var elapsed = (now - lastGenTime) / 1000;
 	  if (elapsed > spawnTime) {
 	    lastGenTime = now;
 	    game.makeObject(context);
 	  }
-	  game.addSushi(nyanCat, speed);
-	  game.addTrash(nyanCat, hearts, speed);
+	  game.refreshSprites(nyanCat, speed, hearts);
 	  game.determineContinue(gameLoop, context, heart3);
 	});
 
@@ -109,11 +97,14 @@
 
 	var lifeCounter = 0;
 	var Sushi = __webpack_require__(2);
-	var Trash = __webpack_require__(4);
-	var Helpers = __webpack_require__(3);
+	var Trash = __webpack_require__(3);
+	var Helpers = __webpack_require__(4);
+	var Draw = __webpack_require__(5);
 
+	var draw = new Draw();
 	var sushis = [];
 	var trashes = [];
+	var sprites = [];
 	var helpers = new Helpers();
 	var lastGenTime = 0;
 	var points = 0;
@@ -122,24 +113,12 @@
 
 	function Game() {}
 
-	Game.prototype.calculateSpawnTime = function (gameTimer) {
-	  var spawnTime = 3 / gameTimer;
-	  if (spawnTime < 0.4) {
-	    spawnTime = 0.4;
-	  }
-	  return spawnTime;
+	Game.prototype.calculateSpawnTime = function (rate, minSpeed, maxSpeed, gameTimer) {
+	  return Math.max(rate * gameTimer + maxSpeed, minSpeed);
 	};
 
-	Game.prototype.calculateSpeed = function (time) {
-	  var timeSinceLastSpeedIncrease = (time - lastSpeedIncrease) / 1000;
-	  if (timeSinceLastSpeedIncrease > 10) {
-	    speed++;
-	    lastSpeedIncrease = Date.now();
-	  }
-	  if (speed > 10) {
-	    speed = 10;
-	  }
-	  return speed;
+	Game.prototype.calculateSpeed = function (rate, minSpeed, maxSpeed, gameTimer) {
+	  return Math.min(rate * gameTimer + minSpeed, maxSpeed);
 	};
 
 	Game.prototype.moveCat = function (event, nyanCat) {
@@ -155,9 +134,9 @@
 	};
 
 	Game.prototype.drawHeartsAndCat = function (context, nyanCat, hearts) {
-	  nyanCat.draw();
+	  draw.drawObject(nyanCat);
 	  for (var i = 0; i < hearts.length; i++) {
-	    hearts[i].draw();
+	    draw.drawObject(hearts[i]);
 	  }
 	};
 
@@ -171,37 +150,37 @@
 	  var number = Math.random();
 	  if (number > 0.5) {
 	    var sushi = new Sushi({ context: context });
-	    sushis.push(sushi);
-	    return sushi;
+	    sprites.push(sushi);
 	  } else {
 	    var trash = new Trash({ context: context });
-	    trashes.push(trash);
-	    return trash;
+	    sprites.push(trash);
 	  }
+	  return sprites;
 	};
 
-	Game.prototype.addSushi = function (nyanCat, gameTimer) {
-	  for (var i = 0; i < sushis.length; i++) {
-	    var currentSushi = sushis[i];
-	    currentSushi.draw();
-	    currentSushi.move(sushis, i, gameTimer);
-	    if (helpers.checkCollision(currentSushi, nyanCat)) {
-	      helpers.clearObject(sushis, i);
-	      points = helpers.addPoints(points, 30);
-	    }
-	  }
-	};
+	Game.prototype.refreshSprites = function (nyanCat, speed, hearts) {
+	  var survivors = [];
 
-	Game.prototype.addTrash = function (nyanCat, hearts, speed) {
-	  for (var i = 0; i < trashes.length; i++) {
-	    var currentTrash = trashes[i];
-	    currentTrash.draw();
-	    currentTrash.move(trashes, i, speed);
-	    if (helpers.checkCollision(currentTrash, nyanCat)) {
-	      helpers.clearObject(trashes, i);
-	      lifeCounter = helpers.checkLoseHeart(lifeCounter, hearts);
+	  for (var i = 0; i < sprites.length; i++) {
+	    var currentObject = sprites[i];
+	    currentObject.move(speed);
+
+	    if (helpers.checkCollision(currentObject, nyanCat)) {
+	      var outcome = helpers.determineObject(currentObject, lifeCounter, hearts, points);
+	      lifeCounter = outcome[0];
+	      points = outcome[1];
+	    } else if (!helpers.offScreen(currentObject)) {
+	      survivors.push(currentObject);
+	      draw.drawObject(currentObject);
 	    }
 	  }
+
+	  sprites = survivors;
+
+	  // create empty survivor array
+	  //only push onto array things that dont get hit or dont go offScreen
+	  //after all sprites are sorted, set the sprite array = to survivor
+	  //this clear everything that shouldn't survive to the next frame
 	};
 
 	Game.prototype.determineContinue = function (gameLoop, context, heart3) {
@@ -209,7 +188,7 @@
 	    requestAnimationFrame(gameLoop);
 	  } else {
 	    heart3.image = document.getElementById("empty-heart");
-	    heart3.draw();
+	    draw.drawObject(heart3);
 	    var gameOver = document.getElementById("game-over");
 	    context.drawImage(gameOver, 200, 200);
 	  }
@@ -219,12 +198,9 @@
 
 /***/ },
 /* 2 */
-/***/ function(module, exports, __webpack_require__) {
+/***/ function(module, exports) {
 
 	'use strict';
-
-	var Helpers = __webpack_require__(3);
-	var helpers = new Helpers();
 
 	function Sushi(options) {
 	  var rowsForSprites = [70, 170, 270, 370];
@@ -237,16 +213,8 @@
 	  this.context = options.context || {};
 	}
 
-	Sushi.prototype.draw = function () {
-	  this.context.drawImage(this.image, this.x, this.y);
-	  return this;
-	};
-
-	Sushi.prototype.move = function (sushis, index, gameTimer) {
-	  this.x -= gameTimer;
-	  if (this.x < -70) {
-	    helpers.clearObject(sushis, index);
-	  }
+	Sushi.prototype.move = function (speed) {
+	  this.x -= speed;
 	  return this;
 	};
 
@@ -254,6 +222,30 @@
 
 /***/ },
 /* 3 */
+/***/ function(module, exports) {
+
+	'use strict';
+
+	function Trash(options) {
+	  var rowsForTrash = [70, 170, 270, 370];
+	  var trashImages = ['kawaii-poop', 'kawaii-toaster'];
+	  this.image = document.getElementById(trashImages[Math.floor(Math.random() * trashImages.length)]);
+	  this.width = 70;
+	  this.height = 58;
+	  this.x = 600;
+	  this.y = rowsForTrash[Math.floor(Math.random() * rowsForTrash.length)];
+	  this.context = options.context || {};;
+	}
+
+	Trash.prototype.move = function (speed) {
+	  this.x -= speed;
+	  return this;
+	};
+
+	module.exports = Trash;
+
+/***/ },
+/* 4 */
 /***/ function(module, exports) {
 
 	"use strict";
@@ -281,6 +273,19 @@
 	  nyanCat.x + nyanCat.width > currentObject.x && nyanCat.y < currentObject.y + currentObject.height && nyanCat.height + nyanCat.y > currentObject.y;
 	};
 
+	Helpers.prototype.offScreen = function (currentObject) {
+	  return currentObject.x < -70;
+	};
+
+	Helpers.prototype.determineObject = function (currentObject, lifeCounter, hearts, points) {
+	  if (currentObject.constructor.name === "Sushi") {
+	    points = this.addPoints(points, 30);
+	  } else if (currentObject.constructor.name === "Trash") {
+	    lifeCounter = this.checkLoseHeart(lifeCounter, hearts);
+	  }
+	  return [lifeCounter, points];
+	};
+
 	Helpers.prototype.checkLoseHeart = function (lifeCounter, hearts) {
 	  if (lifeCounter < 3) {
 	    return lifeCounter = this.loseHeart(hearts, lifeCounter);
@@ -290,42 +295,22 @@
 	module.exports = Helpers;
 
 /***/ },
-/* 4 */
-/***/ function(module, exports, __webpack_require__) {
+/* 5 */
+/***/ function(module, exports) {
 
-	'use strict';
+	"use strict";
 
-	var Helpers = __webpack_require__(3);
-	var helpers = new Helpers();
+	function Draw() {}
 
-	function Trash(options) {
-	  var rowsForTrash = [70, 170, 270, 370];
-	  var trashImages = ['kawaii-poop', 'kawaii-toaster'];
-	  this.image = document.getElementById(trashImages[Math.floor(Math.random() * trashImages.length)]);
-	  this.width = 70;
-	  this.height = 58;
-	  this.x = 600;
-	  this.y = rowsForTrash[Math.floor(Math.random() * rowsForTrash.length)];
-	  this.context = options.context || {};;
-	}
-
-	Trash.prototype.draw = function () {
-	  this.context.drawImage(this.image, this.x, this.y);
-	  return this;
+	Draw.prototype.drawObject = function (object) {
+	  object.context.drawImage(object.image, object.x, object.y);
+	  return object;
 	};
 
-	Trash.prototype.move = function (trashes, index, speed) {
-	  this.x -= speed;
-	  if (this.x < -70) {
-	    helpers.clearObject(trashes, index);
-	  }
-	  return this;
-	};
-
-	module.exports = Trash;
+	module.exports = Draw;
 
 /***/ },
-/* 5 */
+/* 6 */
 /***/ function(module, exports) {
 
 	"use strict";
@@ -339,15 +324,10 @@
 	  this.context = options.context || {};
 	}
 
-	Heart.prototype.draw = function () {
-	  this.context.drawImage(this.image, this.x, this.y);
-	  return this;
-	};
-
 	module.exports = Heart;
 
 /***/ },
-/* 6 */
+/* 7 */
 /***/ function(module, exports) {
 
 	"use strict";
@@ -363,11 +343,6 @@
 	  this.y = 50;
 	  this.context = options.context || {};
 	}
-
-	Cat.prototype.draw = function () {
-	  this.context.drawImage(this.image, this.x, this.y);
-	  return this;
-	};
 
 	Cat.prototype.moveUp = function () {
 	  this.y = Math.max(catDrawMinY, this.y - this.height);

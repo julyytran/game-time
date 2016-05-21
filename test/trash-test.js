@@ -17,10 +17,8 @@ describe("Trash", function() {
     });
   });
   context("within game", function() {
-    var trashes = [new Trash({context: "test"}), new Trash({context: "test"}), new Trash({context: "test"})]
-    var gameTimer = 3
     it('should move left', function() {
-      trash.move(trashes, 1, gameTimer);
+      trash.move(3);
       assert.equal(trash.x, 597);
     });
   });
