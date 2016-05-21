@@ -13,6 +13,7 @@ canvas {
   margin-right: auto;
   display: block;
   display: none;
+  float: left;
 }
 
 #start-screen{
@@ -45,4 +46,12 @@ p {
 
 #start-button{
   /*padding: 3px;*/
+}
+
+#scores{
+  /*position: absolute;*/
+  float: right;
+  width: 200px;
+  height: 500px;
+
 }
