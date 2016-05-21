@@ -44,7 +44,11 @@
 /* 0 */
 /***/ function(module, exports, __webpack_require__) {
 
-	'use strict';
+	"use strict";
+
+	$(document).ready(function () {
+	  $("#start-button").on("click", showCanvas);
+	});
 
 	var canvas = document.getElementById('game');
 	var context = canvas.getContext('2d');
@@ -66,6 +70,11 @@
 	  game.moveCat(event, nyanCat);
 	});
 
+	function showCanvas() {
+	  $("#game").show();
+	  $("#start-screen").hide();
+	}
+
 	requestAnimationFrame(function gameLoop() {
 	  game.clearCanvas(context, canvas);
 	  game.drawHeartsAndCat(context, nyanCat, hearts);
@@ -76,9 +85,6 @@
 	  var speed = game.calculateSpeed(0.07, 3, 10, gameTimer);
 
 	  var spawnTime = game.calculateSpawnTime(-0.05, 0.2, 2.5, gameTimer);
-
-	  console.log("spawn time" + spawnTime);
-	  console.log("speed" + speed);
 
 	  var elapsed = (now - lastGenTime) / 1000;
 	  if (elapsed > spawnTime) {
@@ -102,14 +108,10 @@
 	var Draw = __webpack_require__(5);
 
 	var draw = new Draw();
-	var sushis = [];
-	var trashes = [];
-	var sprites = [];
 	var helpers = new Helpers();
-	var lastGenTime = 0;
+	var sprites = [];
 	var points = 0;
 	var speed = 3;
-	var lastSpeedIncrease = 0;
 
 	function Game() {}
 

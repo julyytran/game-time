@@ -1,11 +1,22 @@
 <!DOCTYPE html>
 <html>
 <head>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.97.5/css/materialize.min.css">
   <link rel="stylesheet" type="text/css" href="game.css">
   <meta charset="utf-8">
   <title>GO GO NYAN CAT</title>
 </head>
 <body>
+  <div class="container center-align">
+    <div id="start-screen" class="center-align">
+      <h1 class="center-align">GO GO NYAN CAT!!!</h1>
+      <h5>Explore the galaxies as Nyan Cat!!!</h5> <br />
+      <img id='nyan-moving' src= "images/nyan-moving.gif"><br /><br />
+      <h5>Eat the sushi! <img id='roe-roll' src= "images/roe-transparent.png"><img id='fish-roll' src= "images/fish-roll-transparent.png"><img id='egg-roll' src= "images/egg-roll-transparent.png"></h5><br />
+      <h5>Avoid <img id='kawaii-poop' src= "images/kawaii-poop.png"> and <img id='kawaii-toaster' src= "images/kawaii-toaster.png"></h5><br />
+       <h5>If you hit one, you lose a <img id='full-heart' src= "images/full-heart.png"> You only get three!</h5><br /><br />
+      <input id="start-button", class="btn purple accent-1", type="button", value="start game!"/> <br /><br />
+    </div>
 
 
     <canvas id="game"
@@ -15,15 +26,11 @@
               style="background: url('images/background.jpg')">
     </canvas>
 
-    <img id='nyan-cat-image' src= "images/nyan-cat.png">
-    <img id='roe-roll' src= "images/roe-transparent.png">
-    <img id='fish-roll' src= "images/fish-roll-transparent.png">
-    <img id='egg-roll' src= "images/egg-roll-transparent.png">
-    <img id='kawaii-poop' src= "images/kawaii-poop.png">
-    <img id='kawaii-toaster' src= "images/kawaii-toaster.png">
-    <img id='full-heart' src= "images/full-heart.png">
     <img id='empty-heart' src= "images/empty-heart.png">
     <img id='game-over' src= "images/game-over-transparent.png">
+    <img id='nyan-cat-image' src= "images/nyan-cat.png">
+
+  </div>
 
   <script src="https://code.jquery.com/jquery-2.2.3.min.js"   integrity="sha256-a23g1Nt4dtEYOj7bR+vTu7+T8VP13humZFBJNIYoEJo="   crossorigin="anonymous"></script>
   <script src="main.bundle.js"></script>

@@ -72,14 +72,10 @@
 	var Draw = __webpack_require__(5);
 
 	var draw = new Draw();
-	var sushis = [];
-	var trashes = [];
-	var sprites = [];
 	var helpers = new Helpers();
-	var lastGenTime = 0;
+	var sprites = [];
 	var points = 0;
 	var speed = 3;
-	var lastSpeedIncrease = 0;
 
 	function Game() {}
 
