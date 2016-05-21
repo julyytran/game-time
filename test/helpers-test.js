@@ -4,6 +4,7 @@ const assert = chai.assert;
 const Helpers = require('../lib/helpers');
 const Cat = require('../lib/cat');
 const Sushi = require('../lib/sushi');
+const Trash = require('../lib/trash');
 const Heart = require('../lib/heart');
 
 describe("Helpers", function() {
@@ -52,7 +53,7 @@ describe("Helpers", function() {
       assert.equal(points, 30)
     });
 
-    it('should check player should lose heart', function() {
+    it('should check if player should lose heart', function() {
       var heart1 = new Heart(500, {context: "test"});
       var heart2 = new Heart(550, {context: "test"});
       var heart3 = new Heart(600, {context: "test"});
@@ -63,7 +64,7 @@ describe("Helpers", function() {
       assert.equal(actual, 1);
     });
 
-    it('should check player should lose heart', function() {
+    it('should check if player should lose heart if lifeCounter is > 3', function() {
       var heart1 = new Heart(500, {context: "test"});
       var heart2 = new Heart(550, {context: "test"});
       var heart3 = new Heart(600, {context: "test"});
@@ -72,6 +73,44 @@ describe("Helpers", function() {
 
       var actual = helpers.checkLoseHeart(lifeCounter, hearts);
       assert.equal(actual, undefined);
+    });
+
+    it('determines object and return lifeCounter and points-hits trash', function() {
+      var heart1 = new Heart(500, {context: "test"});
+      var heart2 = new Heart(550, {context: "test"});
+      var heart3 = new Heart(600, {context: "test"});
+      var hearts = [heart1, heart2, heart3];
+      var trash = new Trash({context: "test"});
+      var points = 0
+      var lifeCounter = 0;
+
+      var actual = helpers.determineObject(trash, lifeCounter, hearts, points);
+      assert.equal(actual[0], 1);
+      assert.equal(actual[1], 0);
+    });
+
+    it('determines object and return lifeCounter and points-hits sushi', function() {
+      var heart1 = new Heart(500, {context: "test"});
+      var heart2 = new Heart(550, {context: "test"});
+      var heart3 = new Heart(600, {context: "test"});
+      var hearts = [heart1, heart2, heart3];
+      var sushi = new Sushi({context: "test"});
+      var points = 0
+      var lifeCounter = 0;
+
+      var actual = helpers.determineObject(sushi, lifeCounter, hearts, points);
+      assert.equal(actual[0], 0);
+      assert.equal(actual[1], 30);
+    });
+
+    it('determines if the object went offscreen', function() {
+      var sushi = new Sushi({context: "test"});
+      sushi.x = 10
+      var onScreen = helpers.offScreen(sushi);
+      assert.equal(onScreen, false);
+      sushi.x = -100
+      var offScreen = helpers.offScreen(sushi);
+      assert.equal(offScreen, true);
     });
   });
 });
