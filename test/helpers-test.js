@@ -23,8 +23,8 @@ describe("Helpers", function() {
     var heart2 = new Heart(550, {context: "test"});
     var heart3 = new Heart(600, {context: "test"});
     var hearts = [heart1, heart2, heart3];
-    var lifeCounter = 0
-    var returnedLifeCounter = helpers.loseHeart(hearts, lifeCounter)
+    var lifeCounter = 0;
+    var returnedLifeCounter = helpers.loseHeart(hearts, lifeCounter);
     assert.equal(returnedLifeCounter, 1);
   });
 
@@ -33,12 +33,12 @@ describe("Helpers", function() {
       var cat = new Cat({context: "test"});
       var sushi = new Sushi({context: "test"});
       var initial = helpers.checkCollision(sushi, cat);
-      assert.equal(initial, false)
-      cat.x = 50
-      cat.y = 50
-      sushi.y = 50
-      sushi.x = 50
-      var expected = helpers.checkCollision(sushi, cat)
+      assert.equal(initial, false);
+      cat.x = 50;
+      cat.y = 50;
+      sushi.y = 50;
+      sushi.x = 50;
+      var expected = helpers.checkCollision(sushi, cat);
       assert.equal(expected, true);
     });
 
@@ -51,7 +51,7 @@ describe("Helpers", function() {
 
     it('should add points and return new points', function() {
       var points = helpers.addPoints(0, 30);
-      assert.equal(points, 30)
+      assert.equal(points, 30);
     });
 
     it('should check if player should lose heart', function() {
@@ -82,7 +82,7 @@ describe("Helpers", function() {
       var heart3 = new Heart(600, {context: "test"});
       var hearts = [heart1, heart2, heart3];
       var trash = new Trash({context: "test"});
-      var points = 0
+      var points = 0;
       var lifeCounter = 0;
 
       var actual = helpers.determineObject(trash, lifeCounter, hearts, points);
@@ -96,7 +96,7 @@ describe("Helpers", function() {
       var heart3 = new Heart(600, {context: "test"});
       var hearts = [heart1, heart2, heart3];
       var sushi = new Sushi({context: "test"});
-      var points = 0
+      var points = 0;
       var lifeCounter = 0;
 
       var actual = helpers.determineObject(sushi, lifeCounter, hearts, points);
@@ -106,10 +106,10 @@ describe("Helpers", function() {
 
     it('determines if the object went offscreen', function() {
       var sushi = new Sushi({context: "test"});
-      sushi.x = 10
+      sushi.x = 10;
       var onScreen = helpers.offScreen(sushi);
       assert.equal(onScreen, false);
-      sushi.x = -100
+      sushi.x = -100;
       var offScreen = helpers.offScreen(sushi);
       assert.equal(offScreen, true);
     });
