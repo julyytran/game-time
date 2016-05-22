@@ -256,11 +256,21 @@
 	Helpers.prototype.determineObject = function (currentObject, lifeCounter, hearts, points) {
 	  if (currentObject.constructor.name === "Sushi") {
 	    points = this.addPoints(points, 30);
+	    var ding = document.getElementById("ding");
+	    playCollisionSound(ding);
 	  } else if (currentObject.constructor.name === "Trash") {
 	    lifeCounter = this.checkLoseHeart(lifeCounter, hearts);
+	    var meow = document.getElementById("cat-meow");
+	    playCollisionSound(meow);
 	  }
 	  return [lifeCounter, points];
 	};
+
+	function playCollisionSound(sound) {
+	  sound.pause();
+	  sound.currentTime = 0;
+	  sound.play();
+	}
 
 	Helpers.prototype.checkLoseHeart = function (lifeCounter, hearts) {
 	  if (lifeCounter < 3) {
@@ -354,8 +364,8 @@
 	// Hot Module Replacement
 	if(false) {
 		// When the styles change, update the <style> tags
-		module.hot.accept("!!/Users/chelseajohnson/Documents/turing/4module/game-time/node_modules/mocha-loader/node_modules/css-loader/index.js!/Users/chelseajohnson/Documents/turing/4module/game-time/node_modules/mocha/mocha.css", function() {
-			var newContent = require("!!/Users/chelseajohnson/Documents/turing/4module/game-time/node_modules/mocha-loader/node_modules/css-loader/index.js!/Users/chelseajohnson/Documents/turing/4module/game-time/node_modules/mocha/mocha.css");
+		module.hot.accept("!!/Users/July/turing/4module/projects/game-time/node_modules/mocha-loader/node_modules/css-loader/index.js!/Users/July/turing/4module/projects/game-time/node_modules/mocha/mocha.css", function() {
+			var newContent = require("!!/Users/July/turing/4module/projects/game-time/node_modules/mocha-loader/node_modules/css-loader/index.js!/Users/July/turing/4module/projects/game-time/node_modules/mocha/mocha.css");
 			if(typeof newContent === 'string') newContent = [[module.id, newContent, '']];
 			update(newContent);
 		});

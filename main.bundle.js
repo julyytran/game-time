@@ -303,11 +303,21 @@
 	Helpers.prototype.determineObject = function (currentObject, lifeCounter, hearts, points) {
 	  if (currentObject.constructor.name === "Sushi") {
 	    points = this.addPoints(points, 30);
+	    var ding = document.getElementById("ding");
+	    playCollisionSound(ding);
 	  } else if (currentObject.constructor.name === "Trash") {
 	    lifeCounter = this.checkLoseHeart(lifeCounter, hearts);
+	    var meow = document.getElementById("cat-meow");
+	    playCollisionSound(meow);
 	  }
 	  return [lifeCounter, points];
 	};
+
+	function playCollisionSound(sound) {
+	  sound.pause();
+	  sound.currentTime = 0;
+	  sound.play();
+	}
 
 	Helpers.prototype.checkLoseHeart = function (lifeCounter, hearts) {
 	  if (lifeCounter < 3) {
