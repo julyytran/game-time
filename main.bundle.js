@@ -48,6 +48,7 @@
 
 	$(document).ready(function () {
 	  $("#start-button").on("click", showCanvas);
+	  $("#restart-button").on("click", showStartScreen);
 	});
 
 	var canvas = document.getElementById('game');
@@ -64,36 +65,46 @@
 	var heart3 = new Heart(600, { context: context });
 	var hearts = [heart1, heart2, heart3];
 	var lastGenTime = 0;
-	var startTime = Date.now();
+	var lifeCounter = 0;
 
 	$(document).on('keydown', function (event) {
 	  game.moveCat(event, nyanCat);
 	});
 
-	function showCanvas() {
-	  $("#game").show();
-	  $("#start-screen").hide();
+	function showStartScreen() {
+	  $("#game-over-screen").hide();
+	  $("#start-screen").show();
 	}
 
-	requestAnimationFrame(function gameLoop() {
-	  game.clearCanvas(context, canvas);
-	  game.drawHeartsAndCat(context, nyanCat, hearts);
-	  game.writePoints(context);
-	  var now = Date.now();
-	  var gameTimer = (now - startTime) / 1000;
+	function showCanvas() {
+	  $("#start-screen").hide();
+	  $(".container #game").show();
+	  var startTime = Date.now();
+	  // lifeCounter = 0;
+	  startGame(startTime);
+	}
 
-	  var speed = game.calculateSpeed(0.07, 3, 10, gameTimer);
+	function startGame(startTime) {
+	  requestAnimationFrame(function gameLoop() {
+	    game.clearCanvas(context, canvas);
+	    game.drawHeartsAndCat(context, nyanCat, hearts);
+	    game.writePoints(context);
+	    var now = Date.now();
+	    var gameTimer = (now - startTime) / 1000;
 
-	  var spawnTime = game.calculateSpawnTime(-0.05, 0.2, 2.5, gameTimer);
+	    var speed = game.calculateSpeed(0.07, 3, 10, gameTimer);
 
-	  var elapsed = (now - lastGenTime) / 1000;
-	  if (elapsed > spawnTime) {
-	    lastGenTime = now;
-	    game.makeObject(context);
-	  }
-	  game.refreshSprites(nyanCat, speed, hearts);
-	  game.determineContinue(gameLoop, context, heart3);
-	});
+	    var spawnTime = game.calculateSpawnTime(-0.05, 0.2, 2.5, gameTimer);
+
+	    var elapsed = (now - lastGenTime) / 1000;
+	    if (elapsed > spawnTime) {
+	      lastGenTime = now;
+	      game.makeObject(context);
+	    }
+	    game.refreshSprites(nyanCat, speed, hearts);
+	    game.determineContinue(gameLoop, context, canvas, heart3, hearts);
+	  });
+	}
 
 /***/ },
 /* 1 */
@@ -178,23 +189,33 @@
 	  }
 
 	  sprites = survivors;
-
-	  // create empty survivor array
-	  //only push onto array things that dont get hit or dont go offScreen
-	  //after all sprites are sorted, set the sprite array = to survivor
-	  //this clear everything that shouldn't survive to the next frame
+	  return lifeCounter;
 	};
 
-	Game.prototype.determineContinue = function (gameLoop, context, heart3) {
+	Game.prototype.determineContinue = function (gameLoop, context, canvas, heart3, hearts) {
 	  if (lifeCounter < 3) {
 	    requestAnimationFrame(gameLoop);
 	  } else {
 	    heart3.image = document.getElementById("empty-heart");
 	    draw.drawObject(heart3);
-	    var gameOver = document.getElementById("game-over");
-	    context.drawImage(gameOver, 200, 200);
+	    this.clearCanvas(context, canvas);
+	    showGameOverScreen();
+	    resetGame(hearts);
 	  }
 	};
+
+	function resetGame(hearts) {
+	  lifeCounter = 0;
+	  points = 0;
+	  for (var i = 0; i < hearts.length; i++) {
+	    hearts[i].image = document.getElementById("full-heart");
+	  }
+	}
+
+	function showGameOverScreen() {
+	  $("#game-over-screen").show();
+	  $("#game").hide();
+	}
 
 	module.exports = Game;
 
