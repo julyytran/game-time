@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<!-- saved from url=(0022)http://localhost:8080/ -->
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <link rel="stylesheet" href="./materialize.min.css">
+  <link rel="stylesheet" type="text/css" href="./game.css">
+  
+  <title>GO GO NYAN CAT</title>
+</head>
+<body>
+  <div class="container center-align">
+    <div id="start-screen" class="center-align" style="display: none;">
+      <h3 class="center-align highlight">GO GO NYAN CAT!!!</h3>
+      <p class="highlight">Explore the galaxies as Nyan Cat!!!</p>
+      <img id="nyan-moving" src="./nyan-moving.gif">
+        <p><span class="highlight">Eat the sushi! </span><img id="roe-roll" src="./roe-transparent.png"><img id="fish-roll" src="./fish-roll-transparent.png"><img id="egg-roll" src="./egg-roll-transparent.png"></p>
+        <p><span class="highlight">Avoid </span><img id="kawaii-poop" src="./kawaii-poop.png"> <span class="highlight"> and </span><img id="kawaii-toaster" src="./kawaii-toaster.png"></p>
+      <p> <span class="highlight">If you hit one, you lose a </span><img id="full-heart" src="./full-heart.png"> <span class="highlight">You only get three!</span></p>
+      <input id="start-button" ,="" class="btn purple accent-1" type="button" value="start game!">
+    </div>
+
+    <div class="game-over-screen" id="game-over-screen" style="display: block;">
+      <br><img id="game-over" src="./game-over-transparent.png"><br><br>
+      <!-- <img id='cat-in-toaster' src= "images/nyan-cat-toaster.png"><br /><br /> -->
+      <h4 class="highlight">Your Top Scores:</h4>
+      <p class="highlight">1</p>
+      <p class="highlight">1</p>
+      <p class="highlight">1</p>
+      <input id="restart-button" ,="" class="btn purple accent-1" type="button" value="play again!">
+    </div>
+
+    <canvas id="game" class="game-canvas" width="670px" height="500px" style="display: none; background: url(&quot;images/background.jpg&quot;);">
+    </canvas>
+
+    <img id="empty-heart" src="./empty-heart.png">
+    <img id="nyan-cat-image" src="./nyan-cat.png">
+
+  </div>
+
+  <script src="./jquery-2.2.3.min.js" integrity="sha256-a23g1Nt4dtEYOj7bR+vTu7+T8VP13humZFBJNIYoEJo=" crossorigin="anonymous"></script>
+  <script src="./main.bundle.js"></script>
+
+
+</body></html>

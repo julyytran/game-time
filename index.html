@@ -4,11 +4,11 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.97.5/css/materialize.min.css">
   <link rel="stylesheet" type="text/css" href="game.css">
   <meta charset="utf-8">
-  <title>GO GO NYAN CAT</title>
+  <title>GO GO NYAN CAT!!!</title>
 </head>
 <body>
   <div class="container center-align">
-    <div id="start-screen" class="center-align">
+    <div id="start-screen" class="center-align start-screen">
       <h3 class="center-align highlight">GO GO NYAN CAT!!!</h3>
       <p class="highlight">Explore the galaxies as Nyan Cat!!!</p>
       <img id='nyan-moving' src= "images/nyan-moving.gif">
@@ -18,7 +18,7 @@
       <input id="start-button", class="btn purple accent-1", type="button", value="start game!"/>
     </div>
 
-    <div id='game-over-screen'>
+    <div class='game-over-screen' id='game-over-screen'>
       <br /><img id='game-over' src= "images/game-over-transparent.png"><br /><br />
       <!-- <img id='cat-in-toaster' src= "images/nyan-cat-toaster.png"><br /><br /> -->
       <h4 class='highlight'>Your Top Scores:</h4>
@@ -28,7 +28,7 @@
       <input id="restart-button", class="btn purple accent-1", type="button", value="play again!"/>
     </div>
 
-    <canvas id="game"
+    <canvas class="game" id="game"
               class="game-canvas"
               width="670px"
               height="500px"
