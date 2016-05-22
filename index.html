@@ -28,11 +28,17 @@
       <input id="restart-button", class="btn purple accent-1", type="button", value="play again!"/>
     </div>
 
-    <canvas class="game" id="game"
-              class="game-canvas"
+    <canvas id="game"
+              class="subcanvs"
               width="670px"
               height="500px"
               style="background: url('images/background.jpg')">
+    </canvas>
+
+    <canvas id="starfield"
+              class="subcanvs"
+              width="670px"
+              height="500px">
     </canvas>
 
     <img id='empty-heart' src= "images/empty-heart.png">
