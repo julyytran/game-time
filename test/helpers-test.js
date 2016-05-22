@@ -23,7 +23,6 @@ describe("Helpers", function() {
     var heart3 = new Heart(600, {context: "test"});
     var hearts = [heart1, heart2, heart3];
     var lifeCounter = 0;
-    document.createElement('game');
     $('canvas').attr('id', 'game');
 
     var returnedLifeCounter = helpers.loseHeart(hearts, lifeCounter);
@@ -100,7 +99,8 @@ describe("Helpers", function() {
       var sushi = new Sushi({context: "test"});
       var points = 0;
       var lifeCounter = 0;
-      // var canvas = document.createElement('ding');
+      // document.createElement('audio');
+      // $('audio').attr('id', 'ding');
 
       var actual = helpers.determineObject(sushi, lifeCounter, hearts, points);
       assert.equal(actual[0], 0);
