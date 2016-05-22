@@ -6,6 +6,7 @@ const Cat = require('../lib/cat');
 const Sushi = require('../lib/sushi');
 const Trash = require('../lib/trash');
 const Heart = require('../lib/heart');
+const Game = require('../lib/game');
 
 describe("Helpers", function() {
   var helpers = new Helpers();
