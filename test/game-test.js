@@ -23,14 +23,14 @@ describe("Game", function() {
       assert.equal(actual, 0.2);
     });
     it("should calculate speed", function() {
-      var gameTimer = 14
+      var gameTimer = 14;
       var actual = game.calculateSpeed(0.07, 3, 10, gameTimer);
-      assert.equal(actual, 3.98)
+      assert.equal(actual, 3.98);
     });
     it("has cap for speed", function() {
-      var gameTimer = 500
+      var gameTimer = 500;
       var actual = game.calculateSpeed(0.07, 3, 10, gameTimer);
-      assert.equal(actual, 10)
+      assert.equal(actual, 10);
     });
   });
 });
