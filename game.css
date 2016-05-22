@@ -11,12 +11,12 @@ html {
 }
 
 #game {
-  padding-left: 0;
+  /*padding-left: 0;
   padding-right: 0;
   margin-left: auto;
-  margin-right: auto;
-  display: none;
-  margin-top: 22px;
+  margin-right: auto;*/
+  /*display: none;*/
+  /*margin-top: 22px;*/
 }
 
 #start-screen{
@@ -48,8 +48,27 @@ p {
   padding: 3px;
 }
 
-/*.subcanvs{
+#canvas-elements{
+  position:relative;
+  /*border:1px solid blue;*/
+  width:670px;
+  height:500px;
+}
+
+.subcanvs{
   position: absolute;
+}
+
+/*.canvas-elements {
+    position: relative;
+    width: 670px;
+    height: 500px;
+}
+
+.canvas-elements canvas {
+    position: absolute;
+    top: 0;
+    left: 0;
 }*/
 
 /*<!-- <img id='cat-in-toaster' src= "images/nyan-cat-toaster.png"><br /><br /> -->*/
