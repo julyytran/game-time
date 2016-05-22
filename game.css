@@ -50,25 +50,14 @@ p {
 
 #canvas-elements{
   position:relative;
-  /*border:1px solid blue;*/
   width:670px;
   height:500px;
+  margin-top: 22px;
+  display: none;
 }
 
 .subcanvs{
   position: absolute;
 }
-
-/*.canvas-elements {
-    position: relative;
-    width: 670px;
-    height: 500px;
-}
-
-.canvas-elements canvas {
-    position: absolute;
-    top: 0;
-    left: 0;
-}*/
 
 /*<!-- <img id='cat-in-toaster' src= "images/nyan-cat-toaster.png"><br /><br /> -->*/
