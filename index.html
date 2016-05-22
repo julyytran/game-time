@@ -4,22 +4,31 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.97.5/css/materialize.min.css">
   <link rel="stylesheet" type="text/css" href="game.css">
   <meta charset="utf-8">
-  <title>GO GO NYAN CAT</title>
+  <title>GO GO NYAN CAT!!!</title>
 </head>
 <body>
   <div class="container center-align">
-    <div id="start-screen" class="center-align">
-      <h1 class="center-align highlight">GO GO NYAN CAT!!!</h1>
-      <h5 class="highlight">Explore the galaxies as Nyan Cat!!!</h5> <br />
-      <img id='nyan-moving' src= "images/nyan-moving.gif"><br /><br />
-      <h5><span class="highlight">Eat the sushi! </span><img id='roe-roll' src= "images/roe-transparent.png"><img id='fish-roll' src= "images/fish-roll-transparent.png"><img id='egg-roll' src= "images/egg-roll-transparent.png"></h5><br />
-      <h5><span class="highlight">Avoid </span><img id='kawaii-poop' src= "images/kawaii-poop.png"> <span class="highlight"> and </span><img id='kawaii-toaster' src= "images/kawaii-toaster.png"></h5><br />
-       <h5> <span class='highlight'>If you hit one, you lose a </span><img id='full-heart' src= "images/full-heart.png"> <span class="highlight">You only get three!</span></h5><br /><br />
-      <input id="start-button", class="btn purple accent-1", type="button", value="start game!"/> <br /><br />
+    <div id="start-screen" class="center-align start-screen">
+      <h3 class="center-align highlight">GO GO NYAN CAT!!!</h3>
+      <p class="highlight">Explore the galaxies as Nyan Cat!!!</p>
+      <img id='nyan-moving' src= "images/nyan-moving.gif">
+        <p><span class="highlight">Eat the sushi! </span><img id='roe-roll' src= "images/roe-transparent.png"><img id='fish-roll' src= "images/fish-roll-transparent.png"><img id='egg-roll' src= "images/egg-roll-transparent.png"></p>
+        <p><span class="highlight">Avoid </span><img id='kawaii-poop' src= "images/kawaii-poop.png"> <span class="highlight"> and </span><img id='kawaii-toaster' src= "images/kawaii-toaster.png"></p>
+      <p> <span class='highlight'>If you hit one, you lose a </span><img id='full-heart' src= "images/full-heart.png"> <span class="highlight">You only get three!</span></p>
+      <input id="start-button", class="btn purple accent-1", type="button", value="start game!"/>
     </div>
 
+    <div class='game-over-screen' id='game-over-screen'>
+      <br /><img id='game-over' src= "images/game-over-transparent.png"><br /><br />
+      <!-- <img id='cat-in-toaster' src= "images/nyan-cat-toaster.png"><br /><br /> -->
+      <h4 class='highlight'>Your Top Scores:</h4>
+      <p class='highlight'>1</p>
+      <p class='highlight'>1</p>
+      <p class='highlight'>1</p>
+      <input id="restart-button", class="btn purple accent-1", type="button", value="play again!"/>
+    </div>
 
-    <canvas id="game"
+    <canvas class="game" id="game"
               class="game-canvas"
               width="670px"
               height="500px"
@@ -27,7 +36,6 @@
     </canvas>
 
     <img id='empty-heart' src= "images/empty-heart.png">
-    <img id='game-over' src= "images/game-over-transparent.png">
     <img id='nyan-cat-image' src= "images/nyan-cat.png">
 
   </div>
