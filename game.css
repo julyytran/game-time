@@ -26,6 +26,7 @@ html {
   color: white;
   width: 670px;
   height: 500px;
+  position: relative;
 }
 
 #game-over-screen{
