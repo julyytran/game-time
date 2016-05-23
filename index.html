@@ -2,6 +2,7 @@
 <html>
 <head>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.97.5/css/materialize.min.css">
+  <link href='https://fonts.googleapis.com/css?family=VT323' rel='stylesheet' type='text/css'>
   <link rel="stylesheet" type="text/css" href="game.css">
   <meta charset="utf-8">
   <title>GO GO NYAN CAT!!!</title>
@@ -15,8 +16,9 @@
   <audio id="ding" type="audio/mpeg" src="audio/ding.mp3"></audio>
   <audio id="cat-meow" type="audio/mpeg" src="audio/cat_meow.mp3"></audio>
 
-  <div class="container center-align">
-    <div id="start-screen" class="center-align start-screen">
+<div class="all-content">
+  <div class="game-screens">
+    <div id="start-screen" class="start-screen">
       <h3 class="center-align highlight">GO GO NYAN CAT!!!</h3>
       <p class="highlight">Explore the galaxies as Nyan Cat!!!</p>
       <img id='nyan-moving' src= "images/nyan-moving.gif">
@@ -28,34 +30,34 @@
 
     <div class='game-over-screen' id='game-over-screen'>
       <br /><img id='game-over' src= "images/game-over-transparent.png"><br /><br />
-      <!-- <img id='cat-in-toaster' src= "images/nyan-cat-toaster.png"><br /><br /> -->
-      <h4 class='highlight'>Your Top Scores:</h4>
-      <p class='highlight'>1</p>
-      <p class='highlight'>1</p>
-      <p class='highlight'>1</p>
+      <img id='cat-in-toaster' src= "images/nyan-cat-toaster.png"><br /><br />
       <input id="restart-button", class="btn purple accent-1", type="button", value="play again!"/>
     </div>
 
     <img id='empty-heart' src= "images/empty-heart.png">
     <img id='nyan-cat-image' src= "images/nyan-cat.png">
 
+    <div id="canvas-elements">
+
+      <canvas id="starfield"
+                class="subcanvs"
+                width="670px"
+                height="500px"
+                style="background: #003466">
+      </canvas>
+
+      <canvas id="game"
+                class="subcanvs"
+                width="670px"
+                height="500px">
+      </canvas>
+    </div>
   </div>
 
-  <div class="container" id="canvas-elements">
-
-    <canvas id="starfield"
-              class="subcanvs"
-              width="670px"
-              height="500px"
-              style="background: #003466">
-    </canvas>
-
-    <canvas id="game"
-              class="subcanvs"
-              width="670px"
-              height="500px">
-    </canvas>
+  <div class="scoreboard">
+    <h5>Scoreboard!</h5>
   </div>
+</div>
 
   <script src="https://www.gstatic.com/firebasejs/live/3.0/firebase.js"></script>
   <script>

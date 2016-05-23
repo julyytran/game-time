@@ -1,5 +1,5 @@
 html {
-   font-family: GillSans, Calibri, Trebuchet, sans-serif;
+   font-family: 'VT323', sans-serif;
  }
 
 #empty-heart {
@@ -49,4 +49,23 @@ p {
 
 .subcanvs{
   position: absolute;
+}
+
+.game-screens{
+  display: inline-block;
+}
+
+.scoreboard{
+  text-align: center;
+  border: 5px solid black;
+  display: inline-block;
+  width:300px;
+  height:500px;
+  vertical-align: top;
+  margin-top: 22px;
+}
+
+.all-content{
+  margin: auto;
+  width: 980px;
 }
