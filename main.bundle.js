@@ -101,7 +101,7 @@
 
 	function startGame(startTime) {
 	  requestAnimationFrame(function gameLoop() {
-	    // document.getElementById("game").style.background ="url('images/background.jpg')";
+	    document.getElementById("starfield").style.background = "#003466";
 	    game.clearCanvas(context, canvas);
 	    game.drawHeartsAndCat(context, nyanCat, hearts);
 	    game.writePoints(context);
@@ -318,7 +318,7 @@
 
 	Helpers.prototype.loseHeart = function (hearts, lifeCounter) {
 	  hearts[lifeCounter].image = document.getElementById("empty-heart");
-	  document.getElementById("game").style.background = 'rgba(255, 0, 0, 0.5)';
+	  document.getElementById("starfield").style.background = 'rgba(255, 0, 0, 0.5)';
 	  lifeCounter++;
 	  return lifeCounter;
 	};

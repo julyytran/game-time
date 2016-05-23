@@ -250,7 +250,7 @@
 
 	Helpers.prototype.loseHeart = function (hearts, lifeCounter) {
 	  hearts[lifeCounter].image = document.getElementById("empty-heart");
-	  document.getElementById("game").style.background = 'rgba(255, 0, 0, 0.5)';
+	  document.getElementById("starfield").style.background = 'rgba(255, 0, 0, 0.5)';
 	  lifeCounter++;
 	  return lifeCounter;
 	};
@@ -8985,7 +8985,7 @@
 	    var heart3 = new Heart(600, { context: "test" });
 	    var hearts = [heart1, heart2, heart3];
 	    var lifeCounter = 0;
-	    $('canvas').attr('id', 'game');
+	    $('canvas').attr('id', 'starfield');
 
 	    var returnedLifeCounter = helpers.loseHeart(hearts, lifeCounter);
 	    assert.equal(returnedLifeCounter, 1);
