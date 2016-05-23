@@ -53,7 +53,6 @@
 
 	var canvas = document.getElementById('game');
 	var context = canvas.getContext('2d');
-
 	var starfield = document.getElementById('starfield');
 	var starfieldCtx = starfield.getContext('2d');
 
