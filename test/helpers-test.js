@@ -17,7 +17,7 @@ describe("Helpers", function() {
     assert.equal(result[1], expected[1]);
   });
 
-  it("should increase lifeCounter and change heart image", function() {
+  it("should increase lifeCounter", function() {
     var heart1 = new Heart(500, {context: "test"});
     var heart2 = new Heart(550, {context: "test"});
     var heart3 = new Heart(600, {context: "test"});

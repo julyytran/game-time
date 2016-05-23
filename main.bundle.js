@@ -53,19 +53,25 @@
 
 	var canvas = document.getElementById('game');
 	var context = canvas.getContext('2d');
+	var starfield = document.getElementById('starfield');
+	var starfieldCtx = starfield.getContext('2d');
 
 	var Game = __webpack_require__(1);
 	var Heart = __webpack_require__(6);
 	var Cat = __webpack_require__(7);
+	var Background = __webpack_require__(8);
 
 	var game = new Game();
+	var background = new Background({ starfield: starfield, starfieldCtx: starfieldCtx, canvas: canvas });
 	var nyanCat = new Cat({ context: context });
 	var heart1 = new Heart(500, { context: context });
 	var heart2 = new Heart(550, { context: context });
 	var heart3 = new Heart(600, { context: context });
 	var hearts = [heart1, heart2, heart3];
 	var lastGenTime = 0;
-	var lifeCounter = 0;
+	var backgroundImage = background.randomStarsImage(starfieldCtx, canvas, starfield);
+	var fps = 60;
+	var offsetLeft = 0;
 
 	$(document).on('keydown', function (event) {
 	  game.moveCat(event, nyanCat);
@@ -78,14 +84,24 @@
 
 	function showCanvas() {
 	  $("#start-screen").hide();
-	  $(".container #game").show();
+	  $("#canvas-elements").show();
 	  var startTime = Date.now();
-	  // lifeCounter = 0;
 	  startGame(startTime);
+	}
+
+	function moveBackground() {
+	  offsetLeft += 1;
+	  if (offsetLeft > backgroundImage.width) {
+	    offsetLeft = 0;
+	  }
+
+	  background.clearCanvas();
+	  background.draw(backgroundImage, offsetLeft);
 	}
 
 	function startGame(startTime) {
 	  requestAnimationFrame(function gameLoop() {
+	    // document.getElementById("game").style.background ="url('images/background.jpg')";
 	    game.clearCanvas(context, canvas);
 	    game.drawHeartsAndCat(context, nyanCat, hearts);
 	    game.writePoints(context);
@@ -102,7 +118,12 @@
 	      game.makeObject(context);
 	    }
 	    game.refreshSprites(nyanCat, speed, hearts);
-	    game.determineContinue(gameLoop, context, canvas, heart3, hearts);
+
+	    setTimeout(function () {
+	      requestAnimationFrame(moveBackground);
+	    }, 1000 / fps);
+
+	    game.determineContinue(gameLoop, context, canvas, hearts);
 	  });
 	}
 
@@ -122,7 +143,7 @@
 	var helpers = new Helpers();
 	var sprites = [];
 	var points = 0;
-	var speed = 3;
+	var endingFrames = 0;
 
 	function Game() {}
 
@@ -192,30 +213,40 @@
 	  return lifeCounter;
 	};
 
-	Game.prototype.determineContinue = function (gameLoop, context, canvas, heart3, hearts) {
+	Game.prototype.determineContinue = function (gameLoop, context, canvas, hearts) {
 	  if (lifeCounter < 3) {
 	    requestAnimationFrame(gameLoop);
 	  } else {
-	    heart3.image = document.getElementById("empty-heart");
-	    draw.drawObject(heart3);
-	    this.clearCanvas(context, canvas);
-	    showGameOverScreen();
-	    resetGame(hearts);
+	    endingFrames++;
+	    this.endGame(gameLoop, context, canvas, hearts);
 	  }
 	};
 
-	function resetGame(hearts) {
+	Game.prototype.endGame = function (gameLoop, context, canvas, hearts) {
+	  if (endingFrames < 25) {
+	    requestAnimationFrame(gameLoop);
+	  } else {
+	    this.clearCanvas(context, canvas);
+	    this.showGameOverScreen();
+	    this.resetGame(hearts);
+	  }
+	};
+
+	Game.prototype.resetGame = function (hearts) {
 	  lifeCounter = 0;
 	  points = 0;
+	  endingFrames = 0;
+	  sprites = [];
 	  for (var i = 0; i < hearts.length; i++) {
 	    hearts[i].image = document.getElementById("full-heart");
 	  }
-	}
+	  return [lifeCounter, points, sprites];
+	};
 
-	function showGameOverScreen() {
+	Game.prototype.showGameOverScreen = function () {
 	  $("#game-over-screen").show();
-	  $("#game").hide();
-	}
+	  $("#canvas-elements").hide();
+	};
 
 	module.exports = Game;
 
@@ -257,7 +288,7 @@
 	  this.height = 58;
 	  this.x = 600;
 	  this.y = rowsForTrash[Math.floor(Math.random() * rowsForTrash.length)];
-	  this.context = options.context || {};;
+	  this.context = options.context || {};
 	}
 
 	Trash.prototype.move = function (speed) {
@@ -273,7 +304,7 @@
 
 	"use strict";
 
-	function Helpers() {};
+	function Helpers() {}
 
 	Helpers.prototype.clearObject = function (collection, index) {
 	  collection.splice(index, 1);
@@ -287,6 +318,7 @@
 
 	Helpers.prototype.loseHeart = function (hearts, lifeCounter) {
 	  hearts[lifeCounter].image = document.getElementById("empty-heart");
+	  document.getElementById("game").style.background = 'rgba(255, 0, 0, 0.5)';
 	  lifeCounter++;
 	  return lifeCounter;
 	};
@@ -314,15 +346,17 @@
 	};
 
 	function playCollisionSound(sound) {
-	  sound.pause();
-	  sound.currentTime = 0;
-	  sound.play();
+	  if (sound) {
+	    sound.pause();
+	    sound.currentTime = 0;
+	    sound.play();
+	  }
 	}
 
 	Helpers.prototype.checkLoseHeart = function (lifeCounter, hearts) {
 	  if (lifeCounter < 3) {
 	    return lifeCounter = this.loseHeart(hearts, lifeCounter);
-	  };
+	  }
 	};
 
 	module.exports = Helpers;
@@ -386,6 +420,58 @@
 	};
 
 	module.exports = Cat;
+
+/***/ },
+/* 8 */
+/***/ function(module, exports) {
+
+	"use strict";
+
+	function Background(options) {
+	  this.starfield = options.starfield;
+	  this.starfieldCtx = options.starfieldCtx;
+	  this.canvas = options.canvas;
+	}
+
+	Background.prototype.randomStarsImage = function (starfieldCtx, canvas, starfield) {
+	  this.getStars();
+
+	  var img = document.createElement("img");
+	  img.src = this.starfield.toDataURL();
+	  return img;
+	};
+
+	Background.prototype.getStars = function () {
+	  this.starfieldCtx.beginPath();
+	  for (var n = 0; n < 100; n++) {
+	    var coordinates = this.getStarCoordinates();
+	    var x = coordinates.x;
+	    var y = coordinates.y;
+	    var radius = coordinates.radius;
+	    this.starfieldCtx.arc(x, y, radius, 0, Math.PI * 2, false);
+	    this.starfieldCtx.closePath();
+	  }
+	  this.starfieldCtx.fillStyle = "white";
+	  this.starfieldCtx.fill();
+	};
+
+	Background.prototype.getStarCoordinates = function () {
+	  var x = parseInt(Math.random() * this.canvas.width);
+	  var y = parseInt(Math.random() * this.canvas.height);
+	  var radius = Math.random() * 3;
+	  return { x: x, y: y, radius: radius };
+	};
+
+	Background.prototype.clearCanvas = function () {
+	  this.starfieldCtx.clearRect(0, 0, this.starfield.width, this.starfield.height);
+	};
+
+	Background.prototype.draw = function (backgroundImage, offsetLeft) {
+	  this.starfieldCtx.drawImage(backgroundImage, -offsetLeft, 0);
+	  this.starfieldCtx.drawImage(backgroundImage, backgroundImage.width - offsetLeft, 0);
+	};
+
+	module.exports = Background;
 
 /***/ }
 /******/ ]);
