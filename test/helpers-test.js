@@ -99,8 +99,6 @@ describe("Helpers", function() {
       var sushi = new Sushi({context: "test"});
       var points = 0;
       var lifeCounter = 0;
-      // document.createElement('audio');
-      // $('audio').attr('id', 'ding');
 
       var actual = helpers.determineObject(sushi, lifeCounter, hearts, points);
       assert.equal(actual[0], 0);
