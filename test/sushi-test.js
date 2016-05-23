@@ -17,10 +17,8 @@ describe("Sushi", function() {
     });
   });
   context("within game", function() {
-    var sushis = [new Sushi({context: "test"}), new Sushi({context: "test"}), new Sushi({context: "test"})]
-    var gameTimer = 3
     it('should move left', function() {
-      sushi.move(sushis, 1, gameTimer);
+      sushi.move(3);
       assert.equal(sushi.x, 597);
     });
   });

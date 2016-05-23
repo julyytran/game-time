@@ -1,0 +1,50 @@
+html {
+   font-family: GillSans, Calibri, Trebuchet, sans-serif;
+ }
+
+#empty-heart {
+  display: none;
+}
+
+#nyan-cat-image {
+  display: none;
+}
+
+canvas {
+  padding-left: 0;
+  padding-right: 0;
+  margin-left: auto;
+  margin-right: auto;
+  display: block;
+  display: none;
+  margin-top: 22px;
+}
+
+#start-screen{
+  text-align: center;
+  margin: auto;
+  background-image: url("images/background.jpg");
+  color: white;
+  width: 670px;
+  height: 500px;
+}
+
+#game-over-screen{
+  text-align: center;
+  margin: auto;
+  background-image: url("images/background.jpg");
+  color: white;
+  width: 670px;
+  height: 500px;
+  display: none;
+  margin-top: 22px;
+}
+
+.highlight {
+  background-color: #003466;
+}
+
+p {
+  font-size: 17px;
+  padding: 3px;
+}
