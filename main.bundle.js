@@ -65,7 +65,6 @@
 	var heart3 = new Heart(600, { context: context });
 	var hearts = [heart1, heart2, heart3];
 	var lastGenTime = 0;
-	var lifeCounter = 0;
 
 	$(document).on('keydown', function (event) {
 	  game.moveCat(event, nyanCat);
@@ -80,12 +79,12 @@
 	  $("#start-screen").hide();
 	  $(".container #game").show();
 	  var startTime = Date.now();
-	  // lifeCounter = 0;
 	  startGame(startTime);
 	}
 
 	function startGame(startTime) {
 	  requestAnimationFrame(function gameLoop() {
+	    document.getElementById("game").style.background = "url('images/background.jpg')";
 	    game.clearCanvas(context, canvas);
 	    game.drawHeartsAndCat(context, nyanCat, hearts);
 	    game.writePoints(context);
@@ -102,7 +101,7 @@
 	      game.makeObject(context);
 	    }
 	    game.refreshSprites(nyanCat, speed, hearts);
-	    game.determineContinue(gameLoop, context, canvas, heart3, hearts);
+	    game.determineContinue(gameLoop, context, canvas, hearts);
 	  });
 	}
 
@@ -122,7 +121,7 @@
 	var helpers = new Helpers();
 	var sprites = [];
 	var points = 0;
-	var speed = 3;
+	var endingFrames = 0;
 
 	function Game() {}
 
@@ -192,21 +191,29 @@
 	  return lifeCounter;
 	};
 
-	Game.prototype.determineContinue = function (gameLoop, context, canvas, heart3, hearts) {
+	Game.prototype.determineContinue = function (gameLoop, context, canvas, hearts) {
 	  if (lifeCounter < 3) {
 	    requestAnimationFrame(gameLoop);
 	  } else {
-	    heart3.image = document.getElementById("empty-heart");
-	    draw.drawObject(heart3);
-	    this.clearCanvas(context, canvas);
+	    endingFrames++;
+	    endGame(this, gameLoop, context, canvas, hearts);
+	  }
+	};
+
+	function endGame(game, gameLoop, context, canvas, hearts) {
+	  if (endingFrames < 25) {
+	    requestAnimationFrame(gameLoop);
+	  } else {
+	    game.clearCanvas(context, canvas);
 	    showGameOverScreen();
 	    resetGame(hearts);
 	  }
-	};
+	}
 
 	function resetGame(hearts) {
 	  lifeCounter = 0;
 	  points = 0;
+	  endingFrames = 0;
 	  for (var i = 0; i < hearts.length; i++) {
 	    hearts[i].image = document.getElementById("full-heart");
 	  }
@@ -257,7 +264,7 @@
 	  this.height = 58;
 	  this.x = 600;
 	  this.y = rowsForTrash[Math.floor(Math.random() * rowsForTrash.length)];
-	  this.context = options.context || {};;
+	  this.context = options.context || {};
 	}
 
 	Trash.prototype.move = function (speed) {
@@ -273,7 +280,7 @@
 
 	"use strict";
 
-	function Helpers() {};
+	function Helpers() {}
 
 	Helpers.prototype.clearObject = function (collection, index) {
 	  collection.splice(index, 1);
@@ -287,6 +294,7 @@
 
 	Helpers.prototype.loseHeart = function (hearts, lifeCounter) {
 	  hearts[lifeCounter].image = document.getElementById("empty-heart");
+	  document.getElementById("game").style.background = 'rgba(255, 0, 0, 0.5)';
 	  lifeCounter++;
 	  return lifeCounter;
 	};
@@ -314,15 +322,17 @@
 	};
 
 	function playCollisionSound(sound) {
-	  sound.pause();
-	  sound.currentTime = 0;
-	  sound.play();
+	  if (sound) {
+	    sound.pause();
+	    sound.currentTime = 0;
+	    sound.play();
+	  }
 	}
 
 	Helpers.prototype.checkLoseHeart = function (lifeCounter, hearts) {
 	  if (lifeCounter < 3) {
 	    return lifeCounter = this.loseHeart(hearts, lifeCounter);
-	  };
+	  }
 	};
 
 	module.exports = Helpers;
