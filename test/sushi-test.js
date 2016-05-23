@@ -17,7 +17,6 @@ describe("Sushi", function() {
     });
   });
   context("within game", function() {
-    var sushis = [new Sushi({context: "test"}), new Sushi({context: "test"}), new Sushi({context: "test"})]
     it('should move left', function() {
       sushi.move(3);
       assert.equal(sushi.x, 597);
