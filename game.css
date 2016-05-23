@@ -10,15 +10,6 @@ html {
   display: none;
 }
 
-#game {
-  padding-left: 0;
-  padding-right: 0;
-  margin-left: auto;
-  margin-right: auto;
-  display: none;
-  margin-top: 22px;
-}
-
 #start-screen{
   text-align: center;
   margin: auto;
@@ -46,4 +37,16 @@ html {
 p {
   font-size: 17px;
   padding: 3px;
+}
+
+#canvas-elements{
+  position:relative;
+  width:670px;
+  height:500px;
+  margin-top: 22px;
+  display: none;
+}
+
+.subcanvs{
+  position: absolute;
 }
