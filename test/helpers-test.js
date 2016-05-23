@@ -23,7 +23,7 @@ describe("Helpers", function() {
     var heart3 = new Heart(600, {context: "test"});
     var hearts = [heart1, heart2, heart3];
     var lifeCounter = 0;
-    $('canvas').attr('id', 'game');
+    $('canvas').attr('id', 'starfield');
 
     var returnedLifeCounter = helpers.loseHeart(hearts, lifeCounter);
     assert.equal(returnedLifeCounter, 1);
