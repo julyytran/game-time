@@ -57,7 +57,7 @@ p {
 
 .scoreboard{
   text-align: center;
-  border: 5px solid black;
+  border: 5px solid #003466;
   display: inline-block;
   width:300px;
   height:500px;
