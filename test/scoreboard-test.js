@@ -15,4 +15,10 @@ describe("Scoreboard", function() {
     assert.equal(sortedScores[2], lowest);
     assert.equal(sortedScores[1], middle);
   });
+  it('saves points', function() {
+    var addedPoints = scoreboard.savePoints(60)
+    debugger
+    assert.equal(addedPoints[0].points, 60);
+    assert.equal(addedPoints[0].username, "unknown user");
+  });
 });
