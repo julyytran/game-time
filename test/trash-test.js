@@ -10,7 +10,7 @@ describe("Trash", function() {
       var rowsForTrash = [70, 170, 270, 370];
 
       assert.equal(trash.x, 600);
-      assert(rowsForTrash.includes(trash.y));
+      assert.isAbove(rowsForTrash.indexOf(trash.y), -1);
       assert.equal(trash.width, 70);
       assert.equal(trash.height, 58);
       assert.equal(trash.context, "test");
