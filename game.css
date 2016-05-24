@@ -69,3 +69,7 @@ p {
   margin: auto;
   width: 980px;
 }
+
+#scoreboard-records {
+  margin-left: 70px;
+}
