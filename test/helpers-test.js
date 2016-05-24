@@ -114,16 +114,5 @@ describe("Helpers", function() {
       var offScreen = helpers.offScreen(sushi);
       assert.equal(offScreen, true);
     });
-
-    it('sorts scores', function() {
-      var highest = {name: "Chelsea", points: 100}
-      var lowest = {name: "Chelsea", points: 20}
-      var middle = {name: "Chelsea", points: 30}
-      var scores = [highest, lowest, middle]
-      var sortedScores = helpers.sortScores(scores)
-      assert.equal(sortedScores[0], highest);
-      assert.equal(sortedScores[2], lowest);
-      assert.equal(sortedScores[1], middle);
-    });
   });
 });
