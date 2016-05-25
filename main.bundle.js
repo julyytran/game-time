@@ -98,7 +98,7 @@
 	  requestAnimationFrame(function gameLoop() {
 	    document.getElementById("starfield").style.background = "#003466";
 
-	    offsetLeft += 1;
+	    offsetLeft += 2;
 	    if (offsetLeft > backgroundImage.width) {
 	      offsetLeft = 0;
 	    }
