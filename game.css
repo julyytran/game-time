@@ -6,9 +6,12 @@ html {
   display: none;
 }
 
-#nyan-cat-image {
+.nyan {
   display: none;
 }
+/*#nyan-cat-image {
+  display: none;
+}*/
 
 #start-screen{
   text-align: center;
