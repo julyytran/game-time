@@ -6,3 +6,4 @@ require('./game-test');
 require('./helpers-test');
 require('./background-test');
 require('./scoreboard-test');
+require('./scoreboard-helpers-test');
