@@ -12,8 +12,8 @@ describe("Background", function() {
   });
   it('gets coordinates for stars', function() {
     var coordinates = background.getStarCoordinates();
-    assert.equal(typeof coordinates.x, "number")
-    assert.equal(typeof coordinates.y, "number")
-    assert.equal(typeof coordinates.radius, "number")
+    assert.equal(typeof coordinates.x, "number");
+    assert.equal(typeof coordinates.y, "number");
+    assert.equal(typeof coordinates.radius, "number");
   });
 });

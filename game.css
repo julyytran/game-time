@@ -65,6 +65,21 @@ p {
   margin-top: 22px;
 }
 
+.high-score-entry {
+  text-align: center;
+  border: 5px solid #003466;
+  display: inline-block;
+  width:300px;
+  height:500px;
+  vertical-align: top;
+  margin-top: 22px;
+  display: none;
+}
+
+#username {
+  width: 80%;
+}
+
 .all-content{
   margin: auto;
   width: 980px;
