@@ -47,7 +47,7 @@
 	"use strict";
 
 	$(document).ready(function () {
-	  game.loadScoreboard();
+	  scoreboard.loadScoreboard();
 	  $("#start-button").on("click", showCanvas);
 	  $("#restart-button").on("click", showStartScreen);
 	});
@@ -58,9 +58,10 @@
 	var starfieldCtx = starfield.getContext('2d');
 
 	var Game = __webpack_require__(1);
-	var Heart = __webpack_require__(11);
-	var Cat = __webpack_require__(12);
-	var Background = __webpack_require__(13);
+	var Heart = __webpack_require__(13);
+	var Cat = __webpack_require__(14);
+	var Background = __webpack_require__(15);
+	var Scoreboard = __webpack_require__(6);
 
 	var game = new Game();
 	var background = new Background({ starfield: starfield, starfieldCtx: starfieldCtx, canvas: canvas });
@@ -68,10 +69,12 @@
 	var heart1 = new Heart(500, { context: context });
 	var heart2 = new Heart(550, { context: context });
 	var heart3 = new Heart(600, { context: context });
+	var scoreboard = new Scoreboard();
 	var hearts = [heart1, heart2, heart3];
 	var lastGenTime = 0;
 	var backgroundImage = background.randomStarsImage(starfieldCtx, canvas, starfield);
 	var offsetLeft = 0;
+	// game.preloadSprites(context)
 
 	$(document).on('keydown', function (event) {
 	  game.moveCat(event, nyanCat);
@@ -80,7 +83,7 @@
 	function showStartScreen() {
 	  $("#game-over-screen").hide();
 	  $("#start-screen").show();
-	  game.loadScoreboard();
+	  scoreboard.loadScoreboard();
 	}
 
 	function showCanvas() {
@@ -130,30 +133,29 @@
 
 	'use strict';
 
-	var firebase = __webpack_require__(2);
-	__webpack_require__(4);
-	var config = {
-	  apiKey: "AIzaSyB7WYLfPqM1FhRDE6WUEaru-14-d963vN4",
-	  authDomain: "go-go-nyan-cat.firebaseapp.com",
-	  databaseURL: "https://go-go-nyan-cat.firebaseio.com",
-	  storageBucket: "go-go-nyan-cat.appspot.com"
-	};
-	var firebaseApp = firebase.initializeApp(config);
-	var fireDb = firebaseApp.database();
-
 	var lifeCounter = 0;
-	var Sushi = __webpack_require__(7);
-	var Trash = __webpack_require__(8);
-	var Helpers = __webpack_require__(9);
-	var Draw = __webpack_require__(10);
+	var Sushi = __webpack_require__(2);
+	var Trash = __webpack_require__(3);
+	var Helpers = __webpack_require__(4);
+	var Draw = __webpack_require__(5);
+	var Scoreboard = __webpack_require__(6);
 
 	var draw = new Draw();
 	var helpers = new Helpers();
+	var scoreboard = new Scoreboard();
 	var sprites = [];
 	var points = 0;
 	var endingFrames = 0;
+	// var preloadedSushis = []
+	// var preloadedTrash = []
 
 	function Game() {}
+
+	// Game.prototype.preloadSprites = function(context) {
+	//   preloadedSushis = [new Sushi({context: context}), new Sushi({context: context}), new Sushi({context: context}), new Sushi({context: context}), new Sushi({context: context}), new Sushi({context: context})]
+	//
+	//   preloadedTrash = [new Trash({context: context}), new Trash({context: context}), new Trash({context: context}), new Trash({context: context}), new Trash({context: context}), new Trash({context: context})]
+	// };
 
 	Game.prototype.calculateSpawnTime = function (rate, minSpeed, maxSpeed, gameTimer) {
 	  return Math.max(rate * gameTimer + maxSpeed, minSpeed);
@@ -192,9 +194,12 @@
 	  var number = Math.random();
 	  if (number > 0.5) {
 	    var sushi = new Sushi({ context: context });
+	    // var sushi = preloadedSushis[Math.floor(Math.random() * preloadedSushis.length)]
+	    sushi.x = 600;
 	    sprites.push(sushi);
 	  } else {
 	    var trash = new Trash({ context: context });
+	    // var trash = preloadedTrash[Math.floor(Math.random() * preloadedTrash.length)]
 	    sprites.push(trash);
 	  }
 	  return sprites;
@@ -235,48 +240,20 @@
 	  if (endingFrames < 25) {
 	    requestAnimationFrame(gameLoop);
 	  } else {
-	    this.savePoints();
+	    scoreboard.savePoints(points);
 	    this.clearCanvas(context, canvas);
 	    this.showGameOverScreen();
 	    this.resetGame(hearts);
 	  }
 	};
 
-	Game.prototype.savePoints = function () {
-	  var username = $("#username").val() || "unknown user";
-	  scoreboardRecords.push({ username: username, points: points });
-	  fireDb.ref('highscore/').set({
-	    highscores: scoreboardRecords
-	  });
-	};
-
-	var scoreboardRecords = [];
-
-	Game.prototype.loadScoreboard = function () {
-	  scoreboardRecords = [];
-	  $('#scoreboard-records').empty();
-
-	  fireDb.ref('highscore/').once('value').then(function (scores) {
-	    var allScores = scores.val().highscores.sort(function (a, b) {
-	      return b.points - a.points;
-	    });
-
-	    for (var i = 0; i < 5; i++) {
-	      if (allScores[i] !== undefined) {
-	        scoreboardRecords.push(allScores[i]);
-	      }
-	    }
-
-	    for (var i = 0; i < scoreboardRecords.length; i++) {
-	      $('#scoreboard-records').append(i + 1 + ". " + allScores[i].username + ": " + allScores[i].points + "<br>");
-	    }
-	  });
-	};
-
 	Game.prototype.resetGame = function (hearts) {
 	  lifeCounter = 0;
 	  points = 0;
 	  endingFrames = 0;
+	  sprites = [];
+	  // preloadedTrash = [];
+	  // preloadedSushis = [];
 	  sprites = [];
 	  for (var i = 0; i < hearts.length; i++) {
 	    hearts[i].image = document.getElementById("full-heart");
@@ -294,6 +271,207 @@
 
 /***/ },
 /* 2 */
+/***/ function(module, exports) {
+
+	'use strict';
+
+	function Sushi(options) {
+	  var rowsForSprites = [70, 170, 270, 370];
+	  var sushiImages = ['egg-roll', 'roe-roll', 'fish-roll'];
+	  this.image = document.getElementById(sushiImages[Math.floor(Math.random() * sushiImages.length)]);
+	  this.width = 70;
+	  this.height = 58;
+	  this.x = 600;
+	  this.y = rowsForSprites[Math.floor(Math.random() * rowsForSprites.length)];
+	  this.context = options.context || {};
+	}
+
+	Sushi.prototype.move = function (speed) {
+	  this.x -= speed;
+	  return this;
+	};
+
+	module.exports = Sushi;
+
+/***/ },
+/* 3 */
+/***/ function(module, exports) {
+
+	'use strict';
+
+	function Trash(options) {
+	  var rowsForTrash = [70, 170, 270, 370];
+	  var trashImages = ['kawaii-poop', 'kawaii-toaster'];
+	  this.image = document.getElementById(trashImages[Math.floor(Math.random() * trashImages.length)]);
+	  this.width = 70;
+	  this.height = 58;
+	  this.x = 600;
+	  this.y = rowsForTrash[Math.floor(Math.random() * rowsForTrash.length)];
+	  this.context = options.context || {};
+	}
+
+	Trash.prototype.move = function (speed) {
+	  this.x -= speed;
+	  return this;
+	};
+
+	module.exports = Trash;
+
+/***/ },
+/* 4 */
+/***/ function(module, exports) {
+
+	"use strict";
+
+	function Helpers() {}
+
+	Helpers.prototype.clearObject = function (collection, index) {
+	  collection.splice(index, 1);
+	  return collection;
+	};
+
+	Helpers.prototype.addPoints = function (points, addedPoints) {
+	  points += addedPoints;
+	  return points;
+	};
+
+	Helpers.prototype.loseHeart = function (hearts, lifeCounter) {
+	  hearts[lifeCounter].image = document.getElementById("empty-heart");
+	  document.getElementById("starfield").style.background = 'rgba(255, 0, 0, 0.5)';
+	  lifeCounter++;
+	  return lifeCounter;
+	};
+
+	Helpers.prototype.checkCollision = function (currentObject, nyanCat) {
+	  return nyanCat.x < currentObject.x + currentObject.width && //make these variables
+	  nyanCat.x + nyanCat.width > currentObject.x && nyanCat.y < currentObject.y + currentObject.height && nyanCat.height + nyanCat.y > currentObject.y;
+	};
+
+	Helpers.prototype.offScreen = function (currentObject) {
+	  return currentObject.x < -70;
+	};
+
+	Helpers.prototype.determineObject = function (currentObject, lifeCounter, hearts, points) {
+	  if (currentObject.constructor.name === "Sushi") {
+	    points = this.addPoints(points, 30);
+	    var ding = document.getElementById("ding");
+	    playCollisionSound(ding);
+	  } else if (currentObject.constructor.name === "Trash") {
+	    lifeCounter = this.checkLoseHeart(lifeCounter, hearts);
+	    var meow = document.getElementById("cat-meow");
+	    playCollisionSound(meow);
+	  }
+	  return [lifeCounter, points];
+	};
+
+	function playCollisionSound(sound) {
+	  if (sound) {
+	    sound.pause();
+	    sound.currentTime = 0;
+	    sound.play();
+	  }
+	}
+
+	Helpers.prototype.checkLoseHeart = function (lifeCounter, hearts) {
+	  if (lifeCounter < 3) {
+	    return lifeCounter = this.loseHeart(hearts, lifeCounter);
+	  }
+	};
+
+	module.exports = Helpers;
+
+/***/ },
+/* 5 */
+/***/ function(module, exports) {
+
+	"use strict";
+
+	function Draw() {}
+
+	Draw.prototype.drawObject = function (object) {
+	  object.context.drawImage(object.image, object.x, object.y);
+	  return object;
+	};
+
+	module.exports = Draw;
+
+/***/ },
+/* 6 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+
+	var firebase = __webpack_require__(7);
+	__webpack_require__(9);
+	var FirebaseConfig = __webpack_require__(12);
+	var firebaseApp = firebase.initializeApp(FirebaseConfig);
+	var fireDb = firebaseApp.database();
+	var scoreboardRecords = [];
+
+	function Scoreboard() {}
+
+	Scoreboard.prototype.savePoints = function (points) {
+	  if (points > scoreboardRecords[4].points) {
+	    var scoreboard = this;
+	    scoreboard.setHighScore(points, scoreboard);
+	  }
+	};
+
+	Scoreboard.prototype.setHighScore = function (points, scoreboard) {
+	  $('.scoreboard').hide();
+	  $('.high-score-entry').css('display', 'inline-block');
+	  $('#submit-name').click(function () {
+	    scoreboard.addToScoreboardRecords(points);
+	    fireDb.ref('highscore/').set({
+	      highscores: scoreboardRecords
+	    });
+	  });
+	};
+
+	Scoreboard.prototype.addToScoreboardRecords = function (points) {
+	  var username = $("#username").val() || "unknown user";
+	  scoreboardRecords.push({ username: username, points: points });
+	  return scoreboardRecords;
+	};
+
+	Scoreboard.prototype.loadScoreboard = function () {
+	  var scoreboard = this;
+	  scoreboardRecords = [];
+	  $('#scoreboard-records').empty();
+
+	  fireDb.ref('highscore/').once('value').then(function (scores) {
+	    var allScores = scoreboard.sortScores(scores.val().highscores);
+	    scoreboard.addScores(allScores);
+	    scoreboard.renderScores(allScores, scoreboardRecords.length);
+	  });
+	};
+
+	Scoreboard.prototype.renderScores = function (allScores, scoreboardLength) {
+	  for (var i = 0; i < scoreboardLength; i++) {
+	    $('#scoreboard-records').append(i + 1 + ". " + allScores[i].username + ": " + allScores[i].points + "<br>");
+	  }
+	};
+
+	Scoreboard.prototype.addScores = function (allScores) {
+	  for (var i = 0; i < 5; i++) {
+	    if (allScores[i] !== undefined) {
+	      scoreboardRecords.push(allScores[i]);
+	    }
+	  }
+	  return scoreboardRecords;
+	};
+
+	Scoreboard.prototype.sortScores = function (scores) {
+	  var sortedScores = scores.sort(function (a, b) {
+	    return b.points - a.points;
+	  });
+	  return sortedScores;
+	};
+
+	module.exports = Scoreboard;
+
+/***/ },
+/* 7 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/**
@@ -303,12 +481,12 @@
 	 *
 	 *   firebase = require('firebase');
 	 */
-	__webpack_require__(3);
+	__webpack_require__(8);
 	module.exports = firebase;
 
 
 /***/ },
-/* 3 */
+/* 8 */
 /***/ function(module, exports) {
 
 	/* WEBPACK VAR INJECTION */(function(global) {/*! @license Firebase v3.0.2
@@ -967,7 +1145,7 @@
 	/* WEBPACK VAR INJECTION */}.call(exports, (function() { return this; }())))
 
 /***/ },
-/* 4 */
+/* 9 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/**
@@ -977,13 +1155,13 @@
 	 *
 	 *   database = require('firebase/database');
 	 */
-	__webpack_require__(5);
-	__webpack_require__(6);
+	__webpack_require__(10);
+	__webpack_require__(11);
 	module.exports = firebase.database;
 
 
 /***/ },
-/* 5 */
+/* 10 */
 /***/ function(module, exports) {
 
 	/* WEBPACK VAR INJECTION */(function(global) {/*! @license Firebase v3.0.2
@@ -1016,7 +1194,7 @@
 	/* WEBPACK VAR INJECTION */}.call(exports, (function() { return this; }())))
 
 /***/ },
-/* 6 */
+/* 11 */
 /***/ function(module, exports) {
 
 	/*! @license Firebase v3.0.2
@@ -1267,133 +1445,20 @@
 
 
 /***/ },
-/* 7 */
-/***/ function(module, exports) {
-
-	'use strict';
-
-	function Sushi(options) {
-	  var rowsForSprites = [70, 170, 270, 370];
-	  var sushiImages = ['egg-roll', 'roe-roll', 'fish-roll'];
-	  this.image = document.getElementById(sushiImages[Math.floor(Math.random() * sushiImages.length)]);
-	  this.width = 70;
-	  this.height = 58;
-	  this.x = 600;
-	  this.y = rowsForSprites[Math.floor(Math.random() * rowsForSprites.length)];
-	  this.context = options.context || {};
-	}
-
-	Sushi.prototype.move = function (speed) {
-	  this.x -= speed;
-	  return this;
-	};
-
-	module.exports = Sushi;
-
-/***/ },
-/* 8 */
-/***/ function(module, exports) {
-
-	'use strict';
-
-	function Trash(options) {
-	  var rowsForTrash = [70, 170, 270, 370];
-	  var trashImages = ['kawaii-poop', 'kawaii-toaster'];
-	  this.image = document.getElementById(trashImages[Math.floor(Math.random() * trashImages.length)]);
-	  this.width = 70;
-	  this.height = 58;
-	  this.x = 600;
-	  this.y = rowsForTrash[Math.floor(Math.random() * rowsForTrash.length)];
-	  this.context = options.context || {};
-	}
-
-	Trash.prototype.move = function (speed) {
-	  this.x -= speed;
-	  return this;
-	};
-
-	module.exports = Trash;
-
-/***/ },
-/* 9 */
+/* 12 */
 /***/ function(module, exports) {
 
 	"use strict";
 
-	function Helpers() {}
-
-	Helpers.prototype.clearObject = function (collection, index) {
-	  collection.splice(index, 1);
-	  return collection;
+	module.exports = {
+	  apiKey: "AIzaSyBOvdlImQTTCNTya9Q6HAX5jnamcffmBLM",
+	  authDomain: "nyan-cat-161f0.firebaseapp.com",
+	  databaseURL: "https://nyan-cat-161f0.firebaseio.com",
+	  storageBucket: ""
 	};
-
-	Helpers.prototype.addPoints = function (points, addedPoints) {
-	  points += addedPoints;
-	  return points;
-	};
-
-	Helpers.prototype.loseHeart = function (hearts, lifeCounter) {
-	  hearts[lifeCounter].image = document.getElementById("empty-heart");
-	  document.getElementById("starfield").style.background = 'rgba(255, 0, 0, 0.5)';
-	  lifeCounter++;
-	  return lifeCounter;
-	};
-
-	Helpers.prototype.checkCollision = function (currentObject, nyanCat) {
-	  return nyanCat.x < currentObject.x + currentObject.width && //make these variables
-	  nyanCat.x + nyanCat.width > currentObject.x && nyanCat.y < currentObject.y + currentObject.height && nyanCat.height + nyanCat.y > currentObject.y;
-	};
-
-	Helpers.prototype.offScreen = function (currentObject) {
-	  return currentObject.x < -70;
-	};
-
-	Helpers.prototype.determineObject = function (currentObject, lifeCounter, hearts, points) {
-	  if (currentObject.constructor.name === "Sushi") {
-	    points = this.addPoints(points, 30);
-	    var ding = document.getElementById("ding");
-	    playCollisionSound(ding);
-	  } else if (currentObject.constructor.name === "Trash") {
-	    lifeCounter = this.checkLoseHeart(lifeCounter, hearts);
-	    var meow = document.getElementById("cat-meow");
-	    playCollisionSound(meow);
-	  }
-	  return [lifeCounter, points];
-	};
-
-	function playCollisionSound(sound) {
-	  if (sound) {
-	    sound.pause();
-	    sound.currentTime = 0;
-	    sound.play();
-	  }
-	}
-
-	Helpers.prototype.checkLoseHeart = function (lifeCounter, hearts) {
-	  if (lifeCounter < 3) {
-	    return lifeCounter = this.loseHeart(hearts, lifeCounter);
-	  }
-	};
-
-	module.exports = Helpers;
 
 /***/ },
-/* 10 */
-/***/ function(module, exports) {
-
-	"use strict";
-
-	function Draw() {}
-
-	Draw.prototype.drawObject = function (object) {
-	  object.context.drawImage(object.image, object.x, object.y);
-	  return object;
-	};
-
-	module.exports = Draw;
-
-/***/ },
-/* 11 */
+/* 13 */
 /***/ function(module, exports) {
 
 	"use strict";
@@ -1410,7 +1475,7 @@
 	module.exports = Heart;
 
 /***/ },
-/* 12 */
+/* 14 */
 /***/ function(module, exports) {
 
 	"use strict";
@@ -1438,7 +1503,7 @@
 	module.exports = Cat;
 
 /***/ },
-/* 13 */
+/* 15 */
 /***/ function(module, exports) {
 
 	"use strict";
@@ -1449,7 +1514,7 @@
 	  this.canvas = options.canvas;
 	}
 
-	Background.prototype.randomStarsImage = function (starfieldCtx, canvas, starfield) {
+	Background.prototype.randomStarsImage = function () {
 	  this.getStars();
 
 	  var img = document.createElement("img");
