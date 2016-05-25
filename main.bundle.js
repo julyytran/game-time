@@ -50,6 +50,7 @@
 	  scoreboard.loadScoreboard();
 	  $("#start-button").on("click", showCanvas);
 	  $("#restart-button").on("click", showStartScreen);
+	  $("#submit-name").on("click", game.sendHighScore);
 	});
 
 	var canvas = document.getElementById('game');
@@ -58,9 +59,9 @@
 	var starfieldCtx = starfield.getContext('2d');
 
 	var Game = __webpack_require__(1);
-	var Heart = __webpack_require__(13);
-	var Cat = __webpack_require__(14);
-	var Background = __webpack_require__(15);
+	var Heart = __webpack_require__(14);
+	var Cat = __webpack_require__(15);
+	var Background = __webpack_require__(16);
 	var Scoreboard = __webpack_require__(6);
 
 	var game = new Game();
@@ -74,7 +75,6 @@
 	var lastGenTime = 0;
 	var backgroundImage = background.randomStarsImage(starfieldCtx, canvas, starfield);
 	var offsetLeft = 0;
-	// game.preloadSprites(context)
 
 	$(document).on('keydown', function (event) {
 	  game.moveCat(event, nyanCat);
@@ -90,7 +90,7 @@
 	  $("#start-screen").hide();
 	  $("#canvas-elements").show();
 	  var startTime = Date.now();
-	  //load images here
+	  game.resetPoints();
 	  startGame(startTime);
 	}
 
@@ -146,16 +146,8 @@
 	var sprites = [];
 	var points = 0;
 	var endingFrames = 0;
-	// var preloadedSushis = []
-	// var preloadedTrash = []
 
 	function Game() {}
-
-	// Game.prototype.preloadSprites = function(context) {
-	//   preloadedSushis = [new Sushi({context: context}), new Sushi({context: context}), new Sushi({context: context}), new Sushi({context: context}), new Sushi({context: context}), new Sushi({context: context})]
-	//
-	//   preloadedTrash = [new Trash({context: context}), new Trash({context: context}), new Trash({context: context}), new Trash({context: context}), new Trash({context: context}), new Trash({context: context})]
-	// };
 
 	Game.prototype.calculateSpawnTime = function (rate, minSpeed, maxSpeed, gameTimer) {
 	  return Math.max(rate * gameTimer + maxSpeed, minSpeed);
@@ -194,19 +186,16 @@
 	  var number = Math.random();
 	  if (number > 0.5) {
 	    var sushi = new Sushi({ context: context });
-	    // var sushi = preloadedSushis[Math.floor(Math.random() * preloadedSushis.length)]
 	    sushi.x = 600;
 	    sprites.push(sushi);
 	  } else {
 	    var trash = new Trash({ context: context });
-	    // var trash = preloadedTrash[Math.floor(Math.random() * preloadedTrash.length)]
 	    sprites.push(trash);
 	  }
 	  return sprites;
 	};
 
 	Game.prototype.refreshSprites = function (nyanCat, speed, hearts) {
-	  //need to preload images,
 	  var survivors = [];
 
 	  for (var i = 0; i < sprites.length; i++) {
@@ -240,7 +229,7 @@
 	  if (endingFrames < 25) {
 	    requestAnimationFrame(gameLoop);
 	  } else {
-	    scoreboard.savePoints(points);
+	    scoreboard.showHighScoreEntry(points);
 	    this.clearCanvas(context, canvas);
 	    this.showGameOverScreen();
 	    this.resetGame(hearts);
@@ -249,11 +238,7 @@
 
 	Game.prototype.resetGame = function (hearts) {
 	  lifeCounter = 0;
-	  points = 0;
 	  endingFrames = 0;
-	  sprites = [];
-	  // preloadedTrash = [];
-	  // preloadedSushis = [];
 	  sprites = [];
 	  for (var i = 0; i < hearts.length; i++) {
 	    hearts[i].image = document.getElementById("full-heart");
@@ -267,6 +252,14 @@
 	  $("#canvas-elements").hide();
 	};
 
+	Game.prototype.sendHighScore = function () {
+	  scoreboard.sendHighScore(points);
+	};
+
+	Game.prototype.resetPoints = function () {
+	  points = 0;
+	};
+
 	module.exports = Game;
 
 /***/ },
@@ -275,10 +268,14 @@
 
 	'use strict';
 
+	var eggRoll = document.getElementById('egg-roll');
+	var roeRoll = document.getElementById('roe-roll');
+	var fishRoll = document.getElementById('fish-roll');
+	var pictures = [eggRoll, roeRoll, fishRoll];
+
 	function Sushi(options) {
 	  var rowsForSprites = [70, 170, 270, 370];
-	  var sushiImages = ['egg-roll', 'roe-roll', 'fish-roll'];
-	  this.image = document.getElementById(sushiImages[Math.floor(Math.random() * sushiImages.length)]);
+	  this.image = pictures[Math.floor(Math.random() * pictures.length)];
 	  this.width = 70;
 	  this.height = 58;
 	  this.x = 600;
@@ -299,10 +296,13 @@
 
 	'use strict';
 
+	var poop = document.getElementById('kawaii-poop');
+	var toaster = document.getElementById('kawaii-toaster');
+	var pictures = [poop, toaster];
+
 	function Trash(options) {
-	  var rowsForTrash = [70, 170, 270, 370];
-	  var trashImages = ['kawaii-poop', 'kawaii-toaster'];
-	  this.image = document.getElementById(trashImages[Math.floor(Math.random() * trashImages.length)]);
+	  var rowsForTrash = [70, 170, 270, 370, 70, 270, 370];
+	  this.image = pictures[Math.floor(Math.random() * pictures.length)];
 	  this.width = 70;
 	  this.height = 58;
 	  this.x = 600;
@@ -403,69 +403,43 @@
 
 	var firebase = __webpack_require__(7);
 	__webpack_require__(9);
-	var FirebaseConfig = __webpack_require__(12);
-	var firebaseApp = firebase.initializeApp(FirebaseConfig);
+	var firebaseConfig = __webpack_require__(12);
+	var firebaseApp = firebase.initializeApp(firebaseConfig);
 	var fireDb = firebaseApp.database();
 	var scoreboardRecords = [];
+	var ScoreboardHelpers = __webpack_require__(13);
+	var helpers = new ScoreboardHelpers();
 
 	function Scoreboard() {}
 
-	Scoreboard.prototype.savePoints = function (points) {
-	  if (points > scoreboardRecords[4].points) {
-	    var scoreboard = this;
-	    scoreboard.setHighScore(points, scoreboard);
+	Scoreboard.prototype.showHighScoreEntry = function (points) {
+	  if (scoreboardRecords[4].points < points) {
+	    $('.scoreboard').hide();
+	    $('.high-score-entry').css('display', 'inline-block');
 	  }
 	};
 
-	Scoreboard.prototype.setHighScore = function (points, scoreboard) {
-	  $('.scoreboard').hide();
-	  $('.high-score-entry').css('display', 'inline-block');
-	  $('#submit-name').click(function () {
-	    scoreboard.addToScoreboardRecords(points);
-	    fireDb.ref('highscore/').set({
-	      highscores: scoreboardRecords
-	    });
+	Scoreboard.prototype.sendHighScore = function (points) {
+	  scoreboardRecords = helpers.addToScoreboardRecords(scoreboardRecords, points);
+	  fireDb.ref('highscore/').set({
+	    highscores: scoreboardRecords
 	  });
-	};
-
-	Scoreboard.prototype.addToScoreboardRecords = function (points) {
-	  var username = $("#username").val() || "unknown user";
-	  scoreboardRecords.push({ username: username, points: points });
-	  return scoreboardRecords;
+	  event.preventDefault();
+	  $(".high-score-entry").hide();
+	  $('#username').val('');
+	  this.loadScoreboard();
+	  $('.scoreboard').show();
 	};
 
 	Scoreboard.prototype.loadScoreboard = function () {
-	  var scoreboard = this;
 	  scoreboardRecords = [];
 	  $('#scoreboard-records').empty();
 
 	  fireDb.ref('highscore/').once('value').then(function (scores) {
-	    var allScores = scoreboard.sortScores(scores.val().highscores);
-	    scoreboard.addScores(allScores);
-	    scoreboard.renderScores(allScores, scoreboardRecords.length);
+	    var allScores = helpers.sortScores(scores.val().highscores);
+	    scoreboardRecords = helpers.addScores(scoreboardRecords, allScores);
+	    helpers.renderScores(allScores, scoreboardRecords.length);
 	  });
-	};
-
-	Scoreboard.prototype.renderScores = function (allScores, scoreboardLength) {
-	  for (var i = 0; i < scoreboardLength; i++) {
-	    $('#scoreboard-records').append(i + 1 + ". " + allScores[i].username + ": " + allScores[i].points + "<br>");
-	  }
-	};
-
-	Scoreboard.prototype.addScores = function (allScores) {
-	  for (var i = 0; i < 5; i++) {
-	    if (allScores[i] !== undefined) {
-	      scoreboardRecords.push(allScores[i]);
-	    }
-	  }
-	  return scoreboardRecords;
-	};
-
-	Scoreboard.prototype.sortScores = function (scores) {
-	  var sortedScores = scores.sort(function (a, b) {
-	    return b.points - a.points;
-	  });
-	  return sortedScores;
 	};
 
 	module.exports = Scoreboard;
@@ -1463,6 +1437,44 @@
 
 	"use strict";
 
+	function ScoreboardHelpers() {}
+
+	ScoreboardHelpers.prototype.addToScoreboardRecords = function (scoreboardRecords, points) {
+	  var username = $("#username").val() || "unknown user";
+	  scoreboardRecords.push({ username: username, points: points });
+	  return scoreboardRecords;
+	};
+
+	ScoreboardHelpers.prototype.renderScores = function (allScores, scoreboardLength) {
+	  for (var i = 0; i < scoreboardLength; i++) {
+	    $('#scoreboard-records').append(i + 1 + ". " + allScores[i].username + ": " + allScores[i].points + "<br>");
+	  }
+	};
+
+	ScoreboardHelpers.prototype.addScores = function (scoreboardRecords, allScores) {
+	  for (var i = 0; i < 5; i++) {
+	    if (allScores[i] !== undefined) {
+	      scoreboardRecords.push(allScores[i]);
+	    }
+	  }
+	  return scoreboardRecords;
+	};
+
+	ScoreboardHelpers.prototype.sortScores = function (scores) {
+	  var sortedScores = scores.sort(function (a, b) {
+	    return b.points - a.points;
+	  });
+	  return sortedScores;
+	};
+
+	module.exports = ScoreboardHelpers;
+
+/***/ },
+/* 14 */
+/***/ function(module, exports) {
+
+	"use strict";
+
 	function Heart(x, options) {
 	  this.image = document.getElementById("full-heart");
 	  this.width = 60;
@@ -1475,7 +1487,7 @@
 	module.exports = Heart;
 
 /***/ },
-/* 14 */
+/* 15 */
 /***/ function(module, exports) {
 
 	"use strict";
@@ -1503,7 +1515,7 @@
 	module.exports = Cat;
 
 /***/ },
-/* 15 */
+/* 16 */
 /***/ function(module, exports) {
 
 	"use strict";
