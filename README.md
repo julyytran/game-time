@@ -1,5 +1,15 @@
 # GO GO NYAN CAT
 
+### About
+
+Simple game built using Node.
+
+URL: http://cheljoh.github.io/game-time/
+
+![example]()
+
+## Setup
+
 To install the dependencies:
 
 ```
@@ -21,11 +31,4 @@ To build the static files:
 
 ```js
 npm run build
-```
-
-
-To run tests in Node:
-
-```js
-npm test
 ```
