@@ -8,10 +8,10 @@ describe("Boom", function() {
     var boom = new Boom({context: "test"});
 
     it('should assign default values', function() {
-      assert.equal(boom.x, 120);
-      assert.equal(boom.y, 120);
-      assert.equal(boom.width, 400);
-      assert.equal(boom.height, 310);
+      assert.equal(boom.x, 140);
+      assert.equal(boom.y, 100);
+      assert.equal(boom.width, 422);
+      assert.equal(boom.height, 362);
       assert.equal(boom.context, "test");
     });
   });
