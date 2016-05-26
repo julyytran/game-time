@@ -2,11 +2,11 @@
 
 ### About
 
-Simple game built using Node.
+Simple nyan cat flying built using JavaScript and HTML5 Canvas.
 
 URL: http://cheljoh.github.io/game-time/
 
-![example]()
+![example](http://g.recordit.co/MMD3Aayoir.gif)
 
 ## Setup
 
