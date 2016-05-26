@@ -35,7 +35,7 @@ describe("Helpers", function() {
       var sushi = new Sushi({context: "test"});
       var initial = helpers.checkCollision(sushi, cat);
       assert.equal(initial, false);
-      cat.x = 50;
+      cat.x = 0;
       cat.y = 50;
       sushi.y = 50;
       sushi.x = 50;
