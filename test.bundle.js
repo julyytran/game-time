@@ -95,6 +95,7 @@
 	  } else if (event.keyCode === 40) {
 	    nyanCat.moveDown();
 	  }
+	  return nyanCat;
 	};
 
 	Game.prototype.clearCanvas = function (context, canvas) {
@@ -132,21 +133,26 @@
 	  if (bomb) {
 	    draw.drawObject(boom);
 	  } else {
-	    for (var i = 0; i < sprites.length; i++) {
-	      var currentObject = sprites[i];
-	      currentObject.move(speed);
-
-	      if (helpers.checkCollision(currentObject, nyanCat)) {
-	        var outcome = helpers.determineObject(currentObject, lifeCounter, hearts, points);
-	        lifeCounter = outcome[0];
-	        points = outcome[1];
-	      } else if (!helpers.offScreen(currentObject)) {
-	        survivors.push(currentObject);
-	        draw.drawObject(currentObject);
-	      }
-	    }
+	    survivors = this.moveSprites(nyanCat, speed, hearts, survivors);
 	  }
 	  sprites = survivors;
+	};
+
+	Game.prototype.moveSprites = function (nyanCat, speed, hearts, survivors) {
+	  for (var i = 0; i < sprites.length; i++) {
+	    var currentObject = sprites[i];
+	    currentObject.move(speed);
+
+	    if (helpers.checkCollision(currentObject, nyanCat)) {
+	      var outcome = helpers.determineObject(currentObject, lifeCounter, hearts, points);
+	      lifeCounter = outcome[0];
+	      points = outcome[1];
+	    } else if (!helpers.offScreen(currentObject)) {
+	      survivors.push(currentObject);
+	      draw.drawObject(currentObject);
+	    }
+	  }
+	  return survivors;
 	};
 
 	Game.prototype.determineContinue = function (gameLoop, context, canvas, hearts) {
@@ -176,7 +182,7 @@
 	  for (var i = 0; i < hearts.length; i++) {
 	    hearts[i].image = document.getElementById("full-heart");
 	  }
-	  return [lifeCounter, points, sprites];
+	  return [lifeCounter, endingFrames, sprites];
 	};
 
 	Game.prototype.showGameOverScreen = function () {
@@ -261,11 +267,6 @@
 	var ding = document.getElementById("ding");
 
 	function Helpers() {}
-
-	Helpers.prototype.clearObject = function (collection, index) {
-	  collection.splice(index, 1);
-	  return collection;
-	};
 
 	Helpers.prototype.addPoints = function (points, addedPoints) {
 	  points += addedPoints;
@@ -424,7 +425,6 @@
 	Scoreboard.prototype.loadScoreboard = function () {
 	  scoreboardRecords = [];
 	  $('#scoreboard-records').empty();
-
 	  fireDb.ref('highscore/').once('value').then(function (scores) {
 	    var allScores = helpers.sortScores(scores.val().highscores);
 	    scoreboardRecords = helpers.addScores(scoreboardRecords, allScores);
@@ -1430,7 +1430,7 @@
 	function ScoreboardHelpers() {}
 
 	ScoreboardHelpers.prototype.addToScoreboardRecords = function (scoreboardRecords, points) {
-	  var username = $("#username").val() || "unknown user";
+	  var username = $("#username").val() || "??????";
 	  scoreboardRecords.push({ username: username, points: points });
 	  return scoreboardRecords;
 	};
@@ -1905,7 +1905,9 @@
 
 	describe("Cat", function () {
 	  var cat = new Cat({ context: "test" });
+
 	  context("with default attributes", function () {
+
 	    it('should assign default values', function () {
 	      assert.equal(cat.x, 0);
 	      assert.equal(cat.y, 70);
@@ -1914,6 +1916,7 @@
 	      assert.equal(cat.context, "test");
 	    });
 	  });
+
 	  context("within game", function () {
 	    it('should decrease y when moving up', function () {
 	      cat.y = 150;
@@ -1925,6 +1928,18 @@
 	      assert.equal(cat.y, 70);
 	      cat.moveDown();
 	      assert.equal(cat.y, 170);
+	    });
+
+	    it('cannnot move above 70', function () {
+	      cat.y = 70;
+	      cat.moveUp();
+	      assert.equal(cat.y, 70);
+	    });
+
+	    it('cannot move below 370', function () {
+	      cat.y = 370;
+	      cat.moveDown();
+	      assert.equal(cat.y, 370);
 	    });
 	  });
 	});
@@ -10012,6 +10027,7 @@
 	var Heart = __webpack_require__(14);
 
 	describe("Heart", function () {
+
 	  context("with default attributes", function () {
 	    var heart = new Heart(10, { context: "test" });
 
@@ -10038,7 +10054,9 @@
 
 	describe("Sushi", function () {
 	  var sushi = new Sushi({ context: "test" });
+
 	  context("with default attributes", function () {
+
 	    it('should assign default values', function () {
 	      var rowsForSprites = [70, 170, 270, 370];
 	      assert.equal(sushi.x, 600);
@@ -10048,7 +10066,9 @@
 	      assert.equal(sushi.context, "test");
 	    });
 	  });
+
 	  context("within game", function () {
+
 	    it('should move left', function () {
 	      sushi.move(3);
 	      assert.equal(sushi.x, 597);
@@ -10069,7 +10089,9 @@
 
 	describe("Trash", function () {
 	  var trash = new Trash({ context: "test" });
+
 	  context("with default attributes", function () {
+
 	    it('should assign default values', function () {
 	      var rowsForTrash = [70, 170, 270, 370];
 
@@ -10080,7 +10102,9 @@
 	      assert.equal(trash.context, "test");
 	    });
 	  });
+
 	  context("within game", function () {
+
 	    it('should move left', function () {
 	      trash.move(3);
 	      assert.equal(trash.x, 597);
@@ -10099,36 +10123,45 @@
 
 	var Game = __webpack_require__(1);
 	var Heart = __webpack_require__(14);
+	var Cat = __webpack_require__(16);
 
 	describe("Game", function () {
 	  var game = new Game();
+
 	  context("make object", function () {
+
 	    it('should make a new sushi or trash object', function () {
 	      var newObject = game.makeObject();
 	      assert.equal(typeof newObject, "object");
 	    });
 	  });
+
 	  context("increases in difficulty", function () {
+
 	    it("should calculate spawn time", function () {
 	      var gameTimer = 20;
 	      var actual = game.calculateSpawnTime(-0.05, 0.2, 2.5, gameTimer);
 	      assert.equal(actual, 1.5);
 	    });
+
 	    it("has cap for spawn time", function () {
 	      var gameTimer = 500;
 	      var actual = game.calculateSpawnTime(-0.05, 0.2, 2.5, gameTimer);
 	      assert.equal(actual, 0.2);
 	    });
+
 	    it("should calculate speed", function () {
 	      var gameTimer = 14;
 	      var actual = game.calculateSpeed(0.07, 3, 10, gameTimer);
 	      assert.equal(actual, 3.98);
 	    });
+
 	    it("has cap for speed", function () {
 	      var gameTimer = 500;
 	      var actual = game.calculateSpeed(0.07, 3, 10, gameTimer);
 	      assert.equal(actual, 10);
 	    });
+
 	    it("resets game variables", function () {
 	      var heart1 = new Heart(500, { context: "test" });
 	      var heart2 = new Heart(550, { context: "test" });
@@ -10139,9 +10172,34 @@
 	      assert.equal(variables[1], 0);
 	      assert.equal(variables[2].length, 0);
 	    });
+
 	    it("resets points", function () {
 	      var points = game.resetPoints();
 	      assert.equal(points, 0);
+	    });
+
+	    it("moves cat down", function () {
+	      var cat = new Cat({ context: "test" });
+	      var event = { keyCode: 40 };
+	      assert.equal(cat.y, 70);
+	      var newCat = game.moveCat(event, cat);
+	      assert.equal(newCat.y, 170);
+	    });
+
+	    it("moves cat up", function () {
+	      var cat = new Cat({ context: "test" });
+	      cat.y = 170;
+	      var event = { keyCode: 38 };
+	      var newCat = game.moveCat(event, cat);
+	      assert.equal(newCat.y, 70);
+	    });
+
+	    it("doesn't move cat if not up or down", function () {
+	      var cat = new Cat({ context: "test" });
+	      assert.equal(cat.y, 70);
+	      var event = { keyCode: 10 };
+	      var newCat = game.moveCat(event, cat);
+	      assert.equal(newCat.y, 70);
 	    });
 	  });
 	});
@@ -10164,13 +10222,6 @@
 	describe("Helpers", function () {
 	  var helpers = new Helpers();
 
-	  it("should remove objects from array", function () {
-	    var sushis = [1, 2, 3, 4];
-	    var result = helpers.clearObject(sushis, 1);
-	    var expected = [1, 3, 4];
-	    assert.equal(result[1], expected[1]);
-	  });
-
 	  it("should increase lifeCounter", function () {
 	    var heart1 = new Heart(500, { context: "test" });
 	    var heart2 = new Heart(550, { context: "test" });
@@ -10184,6 +10235,7 @@
 	  });
 
 	  context("collision detection", function () {
+
 	    it('should return true if objects overlap', function () {
 	      var cat = new Cat({ context: "test" });
 	      var sushi = new Sushi({ context: "test" });
@@ -10284,11 +10336,13 @@
 
 	describe("Background", function () {
 	  var background = new Background({ starfield: "test", starfieldCtx: "test", canvas: "test" });
+
 	  it('should assign default values', function () {
 	    assert.equal(background.starfield, "test");
 	    assert.equal(background.starfieldCtx, "test");
 	    assert.equal(background.canvas, "test");
 	  });
+
 	  it('gets coordinates for stars', function () {
 	    var coordinates = background.getStarCoordinates();
 	    assert.equal(typeof coordinates.x, "number");
@@ -10309,6 +10363,7 @@
 	var Scoreboard = __webpack_require__(6);
 
 	describe("Scoreboard", function () {
+
 	  it('can make a scoreboard', function () {
 	    var scoreboard = new Scoreboard();
 	    assert.equal(scoreboard.constructor.name, "Scoreboard");
@@ -10329,6 +10384,7 @@
 	describe("ScoreboardHelpers", function () {
 	  var scoreboardHelper = new ScoreboardHelpers();
 	  var scoreboardRecords = [];
+
 	  it('sorts scores', function () {
 	    var highest = { name: "Chelsea", points: 100 };
 	    var lowest = { name: "Chelsea", points: 20 };
@@ -10339,11 +10395,13 @@
 	    assert.equal(sortedScores[2], lowest);
 	    assert.equal(sortedScores[1], middle);
 	  });
+
 	  it('saves points', function () {
 	    var addedPoints = scoreboardHelper.addToScoreboardRecords(scoreboardRecords, 60);
 	    assert.equal(addedPoints[0].points, 60);
-	    assert.equal(addedPoints[0].username, "unknown user");
+	    assert.equal(addedPoints[0].username, "??????");
 	  });
+
 	  it('add points', function () {
 	    var score1 = { name: "Chelsea", points: 100 };
 	    var score2 = { name: "Chelsea", points: 20 };
@@ -10419,10 +10477,12 @@
 	var Draw = __webpack_require__(5);
 
 	describe("Draw", function () {
+
 	  it('can make a draw object', function () {
 	    var draw = new Draw();
 	    assert.equal(draw.constructor.name, "Draw");
 	  });
+
 	  context("frame helpers", function () {
 	    var draw = new Draw();
 
