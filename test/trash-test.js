@@ -14,6 +14,7 @@ describe("Trash", function() {
       assert.equal(trash.width, 70);
       assert.equal(trash.height, 58);
       assert.equal(trash.context, "test");
+      assert.equal(trash.blownUp, false);
     });
   });
   context("within game", function() {

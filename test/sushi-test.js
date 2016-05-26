@@ -13,6 +13,7 @@ describe("Sushi", function() {
       assert.equal(sushi.width, 70);
       assert.equal(sushi.height, 58);
       assert.equal(sushi.context, "test");
+      assert.equal(sushi.blownUp, false);
     });
   });
   context("within game", function() {
