@@ -26,5 +26,15 @@ describe("Cat", function() {
       cat.moveDown();
       assert.equal(cat.y, 170);
     });
+    it('cannnot move above 70', function() {
+      cat.y = 70;
+      cat.moveUp();
+      assert.equal(cat.y, 70);
+    });
+    it('cannot move below 370', function() {
+      cat.y = 370;
+      cat.moveDown();
+      assert.equal(cat.y, 370);
+    });
   });
 });

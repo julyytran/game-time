@@ -3,6 +3,7 @@ const assert = chai.assert;
 
 const Game = require('../lib/game');
 const Heart = require('../lib/heart');
+const Cat = require('../lib/cat');
 
 describe("Game", function() {
   var game = new Game();
@@ -46,6 +47,27 @@ describe("Game", function() {
     it("resets points", function() {
       var points = game.resetPoints();
       assert.equal(points, 0);
+    });
+    it("moves cat down", function() {
+      var cat = new Cat({context: "test"});
+      var event = { keyCode: 40 };
+      assert.equal(cat.y, 70);
+      var newCat = game.moveCat(event, cat);
+      assert.equal(newCat.y, 170);
+    });
+    it("moves cat up", function() {
+      var cat = new Cat({context: "test"});
+      cat.y = 170;
+      var event = { keyCode: 38 };
+      var newCat = game.moveCat(event, cat);
+      assert.equal(newCat.y, 70);
+    });
+    it("doesn't move cat if not up or down", function() {
+      var cat = new Cat({context: "test"});
+      assert.equal(cat.y, 70);
+      var event = { keyCode: 10 };
+      var newCat = game.moveCat(event, cat);
+      assert.equal(newCat.y, 70);
     });
   });
 });
