@@ -43,5 +43,9 @@ describe("Game", function() {
       assert.equal(variables[1], 0);
       assert.equal(variables[2].length, 0);
     });
+    it("resets points", function() {
+      var points = game.resetPoints();
+      assert.equal(points, 0);
+    });
   });
 });
