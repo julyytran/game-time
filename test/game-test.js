@@ -41,8 +41,7 @@ describe("Game", function() {
       var hearts = [heart1, heart2, heart3];
       var variables = game.resetGame(hearts);
       assert.equal(variables[0], 0);
-      assert.equal(variables[1], 0);
-      assert.equal(variables[2].length, 0);
+      assert.equal(variables[1].length, 0);
     });
     it("resets points", function() {
       var points = game.resetPoints();
