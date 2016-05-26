@@ -6,6 +6,7 @@ const ScoreboardHelpers = require('../lib/scoreboard-helpers');
 describe("ScoreboardHelpers", function() {
   var scoreboardHelper = new ScoreboardHelpers();
   var scoreboardRecords = [];
+
   it('sorts scores', function() {
     var highest = {name: "Chelsea", points: 100};
     var lowest = {name: "Chelsea", points: 20};
@@ -16,11 +17,13 @@ describe("ScoreboardHelpers", function() {
     assert.equal(sortedScores[2], lowest);
     assert.equal(sortedScores[1], middle);
   });
+
   it('saves points', function() {
     var addedPoints = scoreboardHelper.addToScoreboardRecords(scoreboardRecords, 60);
     assert.equal(addedPoints[0].points, 60);
     assert.equal(addedPoints[0].username, "unknown user");
   });
+  
   it('add points', function() {
     var score1 = {name: "Chelsea", points: 100};
     var score2 = {name: "Chelsea", points: 20};
