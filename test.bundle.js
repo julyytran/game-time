@@ -1430,10 +1430,19 @@
 	function ScoreboardHelpers() {}
 
 	ScoreboardHelpers.prototype.addToScoreboardRecords = function (scoreboardRecords, points) {
-	  var username = $("#username").val() || "??????";
+	  var username = validateInput();
 	  scoreboardRecords.push({ username: username, points: points });
 	  return scoreboardRecords;
 	};
+
+	function validateInput() {
+	  var rawUsername = $("#username").val() || "??????";
+	  var slicedUsername = rawUsername.slice(0, 17);
+	  if (slicedUsername.indexOf(">") !== -1) {
+	    slicedUsername = "Invalid Name";
+	  }
+	  return slicedUsername;
+	}
 
 	ScoreboardHelpers.prototype.renderScores = function (allScores, scoreboardLength) {
 	  for (var i = 0; i < scoreboardLength; i++) {
