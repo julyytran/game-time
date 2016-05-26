@@ -170,7 +170,7 @@
 	};
 
 	Game.prototype.drawHeartsAndCat = function (context, nyanCat, hearts) {
-	  draw.drawObject(nyanCat);
+	  draw.drawCat(nyanCat);
 	  for (var i = 0; i < hearts.length; i++) {
 	    draw.drawObject(hearts[i]);
 	  }
@@ -343,8 +343,17 @@
 	};
 
 	Helpers.prototype.checkCollision = function (currentObject, nyanCat) {
-	  return nyanCat.x < currentObject.x + currentObject.width && //make these variables
-	  nyanCat.x + nyanCat.width > currentObject.x && nyanCat.y < currentObject.y + currentObject.height && nyanCat.height + nyanCat.y > currentObject.y;
+	  var nyanCatStartX = nyanCat.x + nyanCat.width / 2;
+	  var nyanCatStartY = nyanCat.y;
+	  var nyanCatLength = nyanCatStartX + (nyanCat.width - 70);
+	  var nyanCatHeight = nyanCatStartY + nyanCat.height;
+
+	  var objectStartX = currentObject.x;
+	  var objectStartY = currentObject.y;
+	  var objectLength = currentObject.x + currentObject.width;
+	  var objectHeight = currentObject.y + currentObject.height;
+
+	  return nyanCatStartX < objectLength && nyanCatLength > objectStartX && nyanCatStartY < objectHeight && nyanCatHeight > objectStartY;
 	};
 
 	Helpers.prototype.offScreen = function (currentObject) {
@@ -384,13 +393,53 @@
 /* 5 */
 /***/ function(module, exports) {
 
-	"use strict";
+	'use strict';
+
+	var nyan1 = document.getElementById('nyan-1');
+	var nyan2 = document.getElementById('nyan-2');
+	var nyan3 = document.getElementById('nyan-3');
+	var nyan4 = document.getElementById('nyan-4');
+	var nyan5 = document.getElementById('nyan-5');
+	var nyan6 = document.getElementById('nyan-6');
+	var nyan7 = document.getElementById('nyan-7');
+	var nyan8 = document.getElementById('nyan-8');
+	var nyan9 = document.getElementById('nyan-9');
+	var nyan10 = document.getElementById('nyan-10');
+	var nyan11 = document.getElementById('nyan-11');
+	var nyan12 = document.getElementById('nyan-12');
+	var nyanFrames = [nyan1, nyan2, nyan3, nyan4, nyan5, nyan6, nyan7, nyan8, nyan9, nyan10, nyan11, nyan12];
+	var frameCount = 0;
+	var lastFrameTime = 0;
 
 	function Draw() {}
 
 	Draw.prototype.drawObject = function (object) {
 	  object.context.drawImage(object.image, object.x, object.y);
 	  return object;
+	};
+
+	Draw.prototype.drawCat = function (cat) {
+	  var now = Date.now();
+	  var elapsed = now - lastFrameTime;
+	  var frame = nyanFrames[frameCount];
+	  this.checkNewFrame(elapsed, now);
+	  cat.context.drawImage(frame, cat.x, cat.y);
+	  this.resetFrameCount();
+	};
+
+	Draw.prototype.checkNewFrame = function (elapsed, now) {
+	  if (elapsed > 75) {
+	    lastFrameTime = now;
+	    frameCount++;
+	  }
+	  return frameCount;
+	};
+
+	Draw.prototype.resetFrameCount = function () {
+	  if (frameCount === 12) {
+	    frameCount = 0;
+	  }
+	  return frameCount;
 	};
 
 	module.exports = Draw;
@@ -1492,24 +1541,23 @@
 
 	"use strict";
 
-	var catDrawMinY = 50;
-	var catDrawMaxY = 350;
+	var catDrawMinY = 70;
+	var catDrawMaxY = 370;
 
 	function Cat(options) {
-	  this.image = document.getElementById("nyan-cat-image");
-	  this.width = 100;
-	  this.height = 100;
-	  this.x = 10;
-	  this.y = 50;
+	  this.width = 140;
+	  this.height = 55;
+	  this.x = 0;
+	  this.y = 70;
 	  this.context = options.context || {};
 	}
 
 	Cat.prototype.moveUp = function () {
-	  this.y = Math.max(catDrawMinY, this.y - this.height);
+	  this.y = Math.max(catDrawMinY, this.y - 100);
 	};
 
 	Cat.prototype.moveDown = function () {
-	  this.y = Math.min(catDrawMaxY, this.y + this.height);
+	  this.y = Math.min(catDrawMaxY, this.y + 100);
 	};
 
 	module.exports = Cat;
