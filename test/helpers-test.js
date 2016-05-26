@@ -10,13 +10,6 @@ const Heart = require('../lib/heart');
 describe("Helpers", function() {
   var helpers = new Helpers();
 
-  it("should remove objects from array", function() {
-    var sushis = [1, 2, 3, 4];
-    var result = helpers.clearObject(sushis, 1);
-    var expected = [1, 3, 4];
-    assert.equal(result[1], expected[1]);
-  });
-
   it("should increase lifeCounter", function() {
     var heart1 = new Heart(500, {context: "test"});
     var heart2 = new Heart(550, {context: "test"});
@@ -30,6 +23,7 @@ describe("Helpers", function() {
   });
 
   context("collision detection", function() {
+    
     it('should return true if objects overlap', function() {
       var cat = new Cat({context: "test"});
       var sushi = new Sushi({context: "test"});

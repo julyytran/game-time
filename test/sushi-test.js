@@ -5,7 +5,9 @@ const Sushi = require('../lib/sushi');
 
 describe("Sushi", function() {
   var sushi = new Sushi({context: "test"});
+
   context("with default attributes", function() {
+
     it('should assign default values', function() {
       var rowsForSprites = [70, 170, 270, 370];
       assert.equal(sushi.x, 600);
@@ -15,7 +17,9 @@ describe("Sushi", function() {
       assert.equal(sushi.context, "test");
     });
   });
+
   context("within game", function() {
+    
     it('should move left', function() {
       sushi.move(3);
       assert.equal(sushi.x, 597);

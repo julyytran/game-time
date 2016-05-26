@@ -5,7 +5,9 @@ const Trash = require('../lib/trash');
 
 describe("Trash", function() {
   var trash = new Trash({context: "test"});
+
   context("with default attributes", function() {
+
     it('should assign default values', function() {
       var rowsForTrash = [70, 170, 270, 370];
 
@@ -16,7 +18,9 @@ describe("Trash", function() {
       assert.equal(trash.context, "test");
     });
   });
+
   context("within game", function() {
+    
     it('should move left', function() {
       trash.move(3);
       assert.equal(trash.x, 597);

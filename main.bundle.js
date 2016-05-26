@@ -178,6 +178,7 @@
 	  } else if (event.keyCode === 40) {
 	    nyanCat.moveDown();
 	  }
+	  return nyanCat;
 	};
 
 	Game.prototype.clearCanvas = function (context, canvas) {
@@ -215,21 +216,26 @@
 	  if (bomb) {
 	    draw.drawObject(boom);
 	  } else {
-	    for (var i = 0; i < sprites.length; i++) {
-	      var currentObject = sprites[i];
-	      currentObject.move(speed);
-
-	      if (helpers.checkCollision(currentObject, nyanCat)) {
-	        var outcome = helpers.determineObject(currentObject, lifeCounter, hearts, points);
-	        lifeCounter = outcome[0];
-	        points = outcome[1];
-	      } else if (!helpers.offScreen(currentObject)) {
-	        survivors.push(currentObject);
-	        draw.drawObject(currentObject);
-	      }
-	    }
+	    survivors = this.moveSprites(nyanCat, speed, hearts, survivors);
 	  }
 	  sprites = survivors;
+	};
+
+	Game.prototype.moveSprites = function (nyanCat, speed, hearts, survivors) {
+	  for (var i = 0; i < sprites.length; i++) {
+	    var currentObject = sprites[i];
+	    currentObject.move(speed);
+
+	    if (helpers.checkCollision(currentObject, nyanCat)) {
+	      var outcome = helpers.determineObject(currentObject, lifeCounter, hearts, points);
+	      lifeCounter = outcome[0];
+	      points = outcome[1];
+	    } else if (!helpers.offScreen(currentObject)) {
+	      survivors.push(currentObject);
+	      draw.drawObject(currentObject);
+	    }
+	  }
+	  return survivors;
 	};
 
 	Game.prototype.determineContinue = function (gameLoop, context, canvas, hearts) {
@@ -259,7 +265,7 @@
 	  for (var i = 0; i < hearts.length; i++) {
 	    hearts[i].image = document.getElementById("full-heart");
 	  }
-	  return [lifeCounter, points, sprites];
+	  return [lifeCounter, endingFrames, sprites];
 	};
 
 	Game.prototype.showGameOverScreen = function () {
@@ -344,11 +350,6 @@
 	var ding = document.getElementById("ding");
 
 	function Helpers() {}
-
-	Helpers.prototype.clearObject = function (collection, index) {
-	  collection.splice(index, 1);
-	  return collection;
-	};
 
 	Helpers.prototype.addPoints = function (points, addedPoints) {
 	  points += addedPoints;
@@ -507,7 +508,6 @@
 	Scoreboard.prototype.loadScoreboard = function () {
 	  scoreboardRecords = [];
 	  $('#scoreboard-records').empty();
-
 	  fireDb.ref('highscore/').once('value').then(function (scores) {
 	    var allScores = helpers.sortScores(scores.val().highscores);
 	    scoreboardRecords = helpers.addScores(scoreboardRecords, allScores);
@@ -1513,7 +1513,7 @@
 	function ScoreboardHelpers() {}
 
 	ScoreboardHelpers.prototype.addToScoreboardRecords = function (scoreboardRecords, points) {
-	  var username = $("#username").val() || "unknown user";
+	  var username = $("#username").val() || "??????";
 	  scoreboardRecords.push({ username: username, points: points });
 	  return scoreboardRecords;
 	};

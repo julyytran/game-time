@@ -6,7 +6,7 @@ const Bomb = require('../lib/bomb');
 describe("Bomb", function() {
   context("with default attributes", function() {
     var bomb = new Bomb(10, {context: "test"});
-
+    
     it('should assign default values', function() {
       assert.equal(bomb.x, 10);
       assert.equal(bomb.y, 8);
