@@ -21,9 +21,9 @@ describe("ScoreboardHelpers", function() {
   it('saves points', function() {
     var addedPoints = scoreboardHelper.addToScoreboardRecords(scoreboardRecords, 60);
     assert.equal(addedPoints[0].points, 60);
-    assert.equal(addedPoints[0].username, "unknown user");
+    assert.equal(addedPoints[0].username, "??????");
   });
-  
+
   it('add points', function() {
     var score1 = {name: "Chelsea", points: 100};
     var score2 = {name: "Chelsea", points: 20};
