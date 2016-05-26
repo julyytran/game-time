@@ -13,8 +13,8 @@ describe("Draw cat frames", function() {
     });
 
     it('should reset frame counter', function() {
-      var count = draw.resetFrameCount(12);
-      assert.equal(count, 0);
+      var count = draw.resetFrameCount();
+      assert.equal(count, 1);
     });
   });
 });
