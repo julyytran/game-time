@@ -86,13 +86,18 @@ p {
 }
 
 #scoreboard-records {
-  margin-left: 70px;
+  margin-left: 10px;
+  font-size: 25px;
 }
 
-#bomb{
+#boom {
   display: none;
 }
 
-#boom{
-  display: none;
+.instructions {
+  font-size: 25px;
+}
+
+#start-button {
+  font-size: 25px;
 }
