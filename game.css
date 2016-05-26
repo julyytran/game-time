@@ -6,7 +6,7 @@ html {
   display: none;
 }
 
-#nyan-cat-image {
+.nyan {
   display: none;
 }
 
@@ -87,4 +87,12 @@ p {
 
 #scoreboard-records {
   margin-left: 70px;
+}
+
+#bomb{
+  display: none;
+}
+
+#boom{
+  display: none;
 }

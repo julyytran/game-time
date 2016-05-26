@@ -7,3 +7,6 @@ require('./helpers-test');
 require('./background-test');
 require('./scoreboard-test');
 require('./scoreboard-helpers-test');
+require('./bomb-test');
+require('./boom-test');
+require('./draw-test');

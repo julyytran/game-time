@@ -60,9 +60,11 @@
 
 	var Game = __webpack_require__(1);
 	var Heart = __webpack_require__(14);
-	var Cat = __webpack_require__(15);
-	var Background = __webpack_require__(16);
+	var Bomb = __webpack_require__(15);
+	var Cat = __webpack_require__(16);
+	var Background = __webpack_require__(17);
 	var Scoreboard = __webpack_require__(6);
+	var Boom = __webpack_require__(18);
 
 	var game = new Game();
 	var background = new Background({ starfield: starfield, starfieldCtx: starfieldCtx, canvas: canvas });
@@ -70,14 +72,25 @@
 	var heart1 = new Heart(500, { context: context });
 	var heart2 = new Heart(550, { context: context });
 	var heart3 = new Heart(600, { context: context });
+	var bomb1 = new Bomb(250, { context: context });
+	var bomb2 = new Bomb(300, { context: context });
+	var bomb3 = new Bomb(350, { context: context });
+	var bombs = [bomb1, bomb2, bomb3];
+	var boom = new Boom({ context: context });
 	var scoreboard = new Scoreboard();
 	var hearts = [heart1, heart2, heart3];
 	var lastGenTime = 0;
 	var backgroundImage = background.randomStarsImage(starfieldCtx, canvas, starfield);
 	var offsetLeft = 0;
+	var bomb = false;
 
 	$(document).on('keydown', function (event) {
-	  game.moveCat(event, nyanCat);
+	  if (event.keyCode === 38 || event.keyCode === 40) {
+	    game.moveCat(event, nyanCat);
+	  } else if (event.keyCode === 32 && bombs.length > 0) {
+	    bombs.pop();
+	    bomb = true;
+	  }
 	});
 
 	function showStartScreen() {
@@ -91,6 +104,7 @@
 	  $("#canvas-elements").show();
 	  var startTime = Date.now();
 	  game.resetPoints();
+	  bombs = [bomb1, bomb2, bomb3];
 	  startGame(startTime);
 	}
 
@@ -107,7 +121,7 @@
 	    background.draw(backgroundImage, offsetLeft);
 
 	    game.clearCanvas(context, canvas);
-	    game.drawHeartsAndCat(context, nyanCat, hearts);
+	    game.drawHeartsCatAndBombs(nyanCat, hearts, bombs);
 	    game.writePoints(context);
 	    var now = Date.now();
 	    var gameTimer = (now - startTime) / 1000;
@@ -121,7 +135,8 @@
 	      lastGenTime = now;
 	      game.makeObject(context);
 	    }
-	    game.refreshSprites(nyanCat, speed, hearts);
+	    game.refreshSprites(nyanCat, speed, hearts, bomb, boom);
+	    bomb = false;
 
 	    game.determineContinue(gameLoop, context, canvas, hearts);
 	  });
@@ -169,11 +184,10 @@
 	  context.clearRect(0, 0, canvas.width, canvas.height);
 	};
 
-	Game.prototype.drawHeartsAndCat = function (context, nyanCat, hearts) {
-	  draw.drawObject(nyanCat);
-	  for (var i = 0; i < hearts.length; i++) {
-	    draw.drawObject(hearts[i]);
-	  }
+	Game.prototype.drawHeartsCatAndBombs = function (nyanCat, hearts, bombs) {
+	  draw.drawCollection(hearts);
+	  draw.drawCollection(bombs);
+	  draw.drawCat(nyanCat);
 	};
 
 	Game.prototype.writePoints = function (context) {
@@ -195,25 +209,27 @@
 	  return sprites;
 	};
 
-	Game.prototype.refreshSprites = function (nyanCat, speed, hearts) {
+	Game.prototype.refreshSprites = function (nyanCat, speed, hearts, bomb, boom) {
 	  var survivors = [];
 
-	  for (var i = 0; i < sprites.length; i++) {
-	    var currentObject = sprites[i];
-	    currentObject.move(speed);
+	  if (bomb) {
+	    draw.drawObject(boom);
+	  } else {
+	    for (var i = 0; i < sprites.length; i++) {
+	      var currentObject = sprites[i];
+	      currentObject.move(speed);
 
-	    if (helpers.checkCollision(currentObject, nyanCat)) {
-	      var outcome = helpers.determineObject(currentObject, lifeCounter, hearts, points);
-	      lifeCounter = outcome[0];
-	      points = outcome[1];
-	    } else if (!helpers.offScreen(currentObject)) {
-	      survivors.push(currentObject);
-	      draw.drawObject(currentObject);
+	      if (helpers.checkCollision(currentObject, nyanCat)) {
+	        var outcome = helpers.determineObject(currentObject, lifeCounter, hearts, points);
+	        lifeCounter = outcome[0];
+	        points = outcome[1];
+	      } else if (!helpers.offScreen(currentObject)) {
+	        survivors.push(currentObject);
+	        draw.drawObject(currentObject);
+	      }
 	    }
 	  }
-
 	  sprites = survivors;
-	  return lifeCounter;
 	};
 
 	Game.prototype.determineContinue = function (gameLoop, context, canvas, hearts) {
@@ -258,6 +274,7 @@
 
 	Game.prototype.resetPoints = function () {
 	  points = 0;
+	  return points;
 	};
 
 	module.exports = Game;
@@ -323,6 +340,9 @@
 
 	"use strict";
 
+	var meow = document.getElementById("cat-meow");
+	var ding = document.getElementById("ding");
+
 	function Helpers() {}
 
 	Helpers.prototype.clearObject = function (collection, index) {
@@ -343,8 +363,17 @@
 	};
 
 	Helpers.prototype.checkCollision = function (currentObject, nyanCat) {
-	  return nyanCat.x < currentObject.x + currentObject.width && //make these variables
-	  nyanCat.x + nyanCat.width > currentObject.x && nyanCat.y < currentObject.y + currentObject.height && nyanCat.height + nyanCat.y > currentObject.y;
+	  var nyanCatStartX = nyanCat.x + nyanCat.width / 2;
+	  var nyanCatStartY = nyanCat.y;
+	  var nyanCatLength = nyanCatStartX + (nyanCat.width - 70);
+	  var nyanCatHeight = nyanCatStartY + nyanCat.height;
+
+	  var objectStartX = currentObject.x;
+	  var objectStartY = currentObject.y;
+	  var objectLength = currentObject.x + currentObject.width;
+	  var objectHeight = currentObject.y + currentObject.height;
+
+	  return nyanCatStartX < objectLength && nyanCatLength > objectStartX && nyanCatStartY < objectHeight && nyanCatHeight > objectStartY;
 	};
 
 	Helpers.prototype.offScreen = function (currentObject) {
@@ -354,11 +383,9 @@
 	Helpers.prototype.determineObject = function (currentObject, lifeCounter, hearts, points) {
 	  if (currentObject.constructor.name === "Sushi") {
 	    points = this.addPoints(points, 30);
-	    var ding = document.getElementById("ding");
 	    playCollisionSound(ding);
 	  } else if (currentObject.constructor.name === "Trash") {
 	    lifeCounter = this.checkLoseHeart(lifeCounter, hearts);
-	    var meow = document.getElementById("cat-meow");
 	    playCollisionSound(meow);
 	  }
 	  return [lifeCounter, points];
@@ -384,13 +411,59 @@
 /* 5 */
 /***/ function(module, exports) {
 
-	"use strict";
+	'use strict';
+
+	var nyan1 = document.getElementById('nyan-1');
+	var nyan2 = document.getElementById('nyan-2');
+	var nyan3 = document.getElementById('nyan-3');
+	var nyan4 = document.getElementById('nyan-4');
+	var nyan5 = document.getElementById('nyan-5');
+	var nyan6 = document.getElementById('nyan-6');
+	var nyan7 = document.getElementById('nyan-7');
+	var nyan8 = document.getElementById('nyan-8');
+	var nyan9 = document.getElementById('nyan-9');
+	var nyan10 = document.getElementById('nyan-10');
+	var nyan11 = document.getElementById('nyan-11');
+	var nyan12 = document.getElementById('nyan-12');
+	var nyanFrames = [nyan1, nyan2, nyan3, nyan4, nyan5, nyan6, nyan7, nyan8, nyan9, nyan10, nyan11, nyan12];
+	var frameCount = 0;
+	var lastFrameTime = 0;
 
 	function Draw() {}
 
 	Draw.prototype.drawObject = function (object) {
 	  object.context.drawImage(object.image, object.x, object.y);
 	  return object;
+	};
+
+	Draw.prototype.drawCollection = function (collection) {
+	  for (var i = 0; i < collection.length; i++) {
+	    this.drawObject(collection[i]);
+	  }
+	};
+
+	Draw.prototype.drawCat = function (cat) {
+	  var now = Date.now();
+	  var elapsed = now - lastFrameTime;
+	  var frame = nyanFrames[frameCount];
+	  this.checkNewFrame(elapsed, now);
+	  cat.context.drawImage(frame, cat.x, cat.y);
+	  this.resetFrameCount();
+	};
+
+	Draw.prototype.checkNewFrame = function (elapsed, now) {
+	  if (elapsed > 75) {
+	    lastFrameTime = now;
+	    frameCount++;
+	  }
+	  return frameCount;
+	};
+
+	Draw.prototype.resetFrameCount = function () {
+	  if (frameCount === 12) {
+	    frameCount = 0;
+	  }
+	  return frameCount;
 	};
 
 	module.exports = Draw;
@@ -1492,30 +1565,46 @@
 
 	"use strict";
 
-	var catDrawMinY = 50;
-	var catDrawMaxY = 350;
+	function Bomb(x, options) {
+	  this.image = document.getElementById("bomb");
+	  this.width = 50;
+	  this.height = 50;
+	  this.x = x;
+	  this.y = 8;
+	  this.context = options.context || {};
+	}
+
+	module.exports = Bomb;
+
+/***/ },
+/* 16 */
+/***/ function(module, exports) {
+
+	"use strict";
+
+	var catDrawMinY = 70;
+	var catDrawMaxY = 370;
 
 	function Cat(options) {
-	  this.image = document.getElementById("nyan-cat-image");
-	  this.width = 100;
-	  this.height = 100;
-	  this.x = 10;
-	  this.y = 50;
+	  this.width = 140;
+	  this.height = 55;
+	  this.x = 0;
+	  this.y = 70;
 	  this.context = options.context || {};
 	}
 
 	Cat.prototype.moveUp = function () {
-	  this.y = Math.max(catDrawMinY, this.y - this.height);
+	  this.y = Math.max(catDrawMinY, this.y - 100);
 	};
 
 	Cat.prototype.moveDown = function () {
-	  this.y = Math.min(catDrawMaxY, this.y + this.height);
+	  this.y = Math.min(catDrawMaxY, this.y + 100);
 	};
 
 	module.exports = Cat;
 
 /***/ },
-/* 16 */
+/* 17 */
 /***/ function(module, exports) {
 
 	"use strict";
@@ -1565,6 +1654,23 @@
 	};
 
 	module.exports = Background;
+
+/***/ },
+/* 18 */
+/***/ function(module, exports) {
+
+	"use strict";
+
+	function Boom(options) {
+	  this.image = document.getElementById("boom");
+	  this.width = 422;
+	  this.height = 362;
+	  this.x = 140;
+	  this.y = 100;
+	  this.context = options.context || {};
+	}
+
+	module.exports = Boom;
 
 /***/ }
 /******/ ]);
