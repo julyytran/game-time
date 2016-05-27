@@ -78,6 +78,7 @@
 	var sprites = [];
 	var points = 0;
 	var endingFrames = 0;
+	var boom_sound = document.getElementById("boom-sound");
 
 	function Game() {}
 
@@ -131,6 +132,7 @@
 	  var survivors = [];
 
 	  if (bomb) {
+	    helpers.playCollisionSound(boom_sound);
 	    draw.drawObject(boom);
 	  } else {
 	    survivors = this.moveSprites(nyanCat, speed, hearts, survivors);
@@ -301,21 +303,21 @@
 	Helpers.prototype.determineObject = function (currentObject, lifeCounter, hearts, points) {
 	  if (currentObject.constructor.name === "Sushi") {
 	    points = this.addPoints(points, 30);
-	    playCollisionSound(ding);
+	    this.playCollisionSound(ding);
 	  } else if (currentObject.constructor.name === "Trash") {
 	    lifeCounter = this.checkLoseHeart(lifeCounter, hearts);
-	    playCollisionSound(meow);
+	    this.playCollisionSound(meow);
 	  }
 	  return [lifeCounter, points];
 	};
 
-	function playCollisionSound(sound) {
+	Helpers.prototype.playCollisionSound = function (sound) {
 	  if (sound) {
 	    sound.pause();
 	    sound.currentTime = 0;
 	    sound.play();
 	  }
-	}
+	};
 
 	Helpers.prototype.checkLoseHeart = function (lifeCounter, hearts) {
 	  if (lifeCounter < 3) {
