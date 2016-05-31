@@ -2,7 +2,7 @@
 
 ## About
 
-Nyan cat flying game built using JavaScript, jQuery, and HTML5 Canvas. Tested with Mocha and Chai.
+Nyan cat flying game built using JavaScript, jQuery, and HTML5 Canvas. Tested with Mocha and Chai. The game includes a moving background, music, sound effects, bombs, self-renewing sprites, and collision detection. Top 5 high scores are stored in Firebase and displayed in real-time. 
 
 [Play now!](http://cheljoh.github.io/game-time/) 
 
